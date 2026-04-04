@@ -4,7 +4,7 @@
 
 Browser-Extension zum Exportieren von Gesprächen aus **Claude**, **ChatGPT**, **Gemini** und **Microsoft Copilot** — als vollständige, eigenständige Dateien die ohne Account, ohne Plattform und ohne Internetverbindung funktionieren.
 
-**Version:** 1.4.0 · **Browser:** Chrome, Edge
+**Version:** 1.4.1 · **Browser:** Chrome, Edge
 
 ---
 

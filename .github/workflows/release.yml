@@ -1,0 +1,67 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read version from manifest
+        id: version
+        run: |
+          VERSION=$(jq -r '.version' manifest.json)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Detect preview release
+        id: flags
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          if [[ "$TAG" == *"-preview" ]]; then
+            echo "is_preview=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_preview=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build extension ZIP
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          zip -r "ai-chat-exporter-${VERSION}.zip" . \
+            --exclude "*.git*" \
+            --exclude ".github/*" \
+            --exclude "screenshots/*" \
+            --exclude "README*" \
+            --exclude "CLAUDE.md" \
+            --exclude "NOTICE" \
+            --exclude "LICENSE.md" \
+            --exclude "VERSION" \
+            --exclude "privacy-policy.html" \
+            --exclude "*.zip"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "v${{ steps.version.outputs.version }}"
+          prerelease: ${{ steps.flags.outputs.is_preview }}
+          generate_release_notes: true
+          files: ai-chat-exporter-${{ steps.version.outputs.version }}.zip
+
+      - name: Upload to Chrome Web Store
+        if: steps.flags.outputs.is_preview == 'false'
+        uses: fregante/chrome-webstore-upload-action@v3
+        with:
+          extension-id: ${{ secrets.CWS_EXTENSION_ID }}
+          client-id: ${{ secrets.CWS_CLIENT_ID }}
+          client-secret: ${{ secrets.CWS_CLIENT_SECRET }}
+          refresh-token: ${{ secrets.CWS_REFRESH_TOKEN }}
+          upload-only: false

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — AI Chat Exporter</title>
+  <style>
+    :root { --text: #1a1a1a; --text-sec: #555; --border: #e5e7eb; --accent: #4f46e5; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+           line-height: 1.7; color: var(--text); background: #f8f9fa; }
+    .container { max-width: 760px; margin: 0 auto; padding: 48px 24px; background: #fff;
+                 min-height: 100vh; }
+    h1 { font-size: 28px; font-weight: 700; margin-bottom: 6px; }
+    .subtitle { color: var(--text-sec); font-size: 14px; margin-bottom: 40px;
+                padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+    h2 { font-size: 18px; font-weight: 600; margin: 32px 0 12px; }
+    h3 { font-size: 15px; font-weight: 600; margin: 20px 0 8px; color: var(--text-sec); }
+    p { margin-bottom: 12px; }
+    ul { margin: 8px 0 12px 20px; }
+    li { margin-bottom: 4px; }
+    table { border-collapse: collapse; width: 100%; margin: 12px 0 20px; font-size: 14px; }
+    th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; }
+    th { background: #f3f4f6; font-weight: 600; }
+    code { background: #f3f4f6; padding: 2px 6px; border-radius: 4px;
+           font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.88em; }
+    .flow { background: #f3f4f6; border-left: 3px solid var(--accent);
+            padding: 12px 16px; border-radius: 4px; font-family: monospace;
+            font-size: 14px; margin: 12px 0; }
+    .badge { display: inline-block; background: #e0e7ff; color: #3730a3;
+             font-size: 12px; font-weight: 600; padding: 2px 8px;
+             border-radius: 12px; margin-right: 6px; }
+    footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--border);
+             font-size: 13px; color: var(--text-sec); }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <h1>Privacy Policy</h1>
+  <p class="subtitle">AI Chat Exporter · Last updated: April 2026</p>
+
+  <p>AI Chat Exporter is a browser extension for Chrome and Edge that exports conversations from Claude, ChatGPT, Gemini, and Microsoft Copilot as local files (HTML, ZIP, Markdown, PDF). This policy explains what data is processed and how.</p>
+
+  <h2>Summary</h2>
+  <ul>
+    <li>All processing happens <strong>locally in your browser</strong>.</li>
+    <li>No data is sent to the extension developer or any third party.</li>
+    <li>No analytics, no tracking, no advertising.</li>
+    <li>The extension only activates on the four supported chat platforms and is completely inactive on all other websites.</li>
+  </ul>
+
+  <h2>ChatGPT, Gemini, Microsoft Copilot</h2>
+  <p>For these platforms, the extension reads content exclusively from the <strong>already-rendered DOM</strong> — the page that is already loaded in your browser. No additional network requests are made. Nothing is uploaded or transmitted.</p>
+
+  <h2>Claude (claude.ai)</h2>
+  <p>Claude uses its official API to provide complete and structured export data, including Artifacts, Thinking blocks, and generated files. To do this, the extension makes authenticated requests to <code>claude.ai</code> on your behalf.</p>
+
+  <h3>What is requested and why</h3>
+  <table>
+    <thead>
+      <tr><th>Request</th><th>Endpoint</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>GET</td>
+        <td><code>/api/organizations/{orgId}/chat_conversations/{id}</code></td>
+        <td>Fetch the full conversation data for export</td>
+      </tr>
+      <tr>
+        <td>GET</td>
+        <td><code>/api/bootstrap</code> or <code>/api/organizations</code></td>
+        <td>Determine your organisation ID (only if not already known from an intercepted page request)</td>
+      </tr>
+      <tr>
+        <td>GET</td>
+        <td><code>/api/share/{id}</code></td>
+        <td>Fetch shared conversations (no authentication required)</td>
+      </tr>
+      <tr>
+        <td>GET</td>
+        <td>Image URL on <code>claude.ai</code></td>
+        <td>Fetch embedded images as Base64 for self-contained exports (only when "Embed images" option is enabled)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>What is transmitted</h3>
+  <p>Each request uses your browser's existing session cookies for <code>claude.ai</code> — the same cookies already sent during normal use of the website. The extension does not read, store, or forward any additional credentials (passwords, API keys, tokens).</p>
+  <p>All requests go exclusively to <code>claude.ai</code>. No data is sent to the extension developer or any other destination.</p>
+
+  <h3>Data flow</h3>
+  <div class="flow">claude.ai API &nbsp;→&nbsp; browser memory &nbsp;→&nbsp; local export file (HTML / ZIP / MD / PDF)</div>
+  <p>Conversation data is fetched into browser memory, converted into the chosen export format, and saved to a local file via the browser's download dialog. It is never uploaded, forwarded, or cached beyond the current browser session.</p>
+
+  <h2>Temporary session storage</h2>
+  <p><code>chrome.storage.session</code> is used solely to pass data from the active tab to the Preview &amp; Select page within the same browser session. This storage is automatically cleared when the browser is closed.</p>
+
+  <h2>What the extension does not do</h2>
+  <ul>
+    <li>Does not read, store, or transmit your password or any API key</li>
+    <li>Does not modify conversations or send any write requests</li>
+    <li>Does not collect usage data, statistics, or telemetry</li>
+    <li>Does not load external scripts or resources into the extension itself<br>
+        <small>(CDN libraries are only referenced inside sandboxed iframes within exported artifact files)</small></li>
+    <li>Does not run on any website other than the four supported platforms</li>
+  </ul>
+
+  <h2>Third-party libraries in exported files</h2>
+  <p>When exporting Claude Artifacts (interactive React apps, Mermaid diagrams, etc.), the resulting HTML file may contain references to CDN-hosted libraries (React, Mermaid, Babel, Tailwind CSS, Recharts). These references are loaded by the <strong>exported file</strong>, not by the extension itself, and only when you open the exported file in a browser with an active internet connection.</p>
+
+  <h2>Permissions</h2>
+  <table>
+    <thead>
+      <tr><th>Permission</th><th>Reason</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>activeTab</code></td><td>Read content from the currently active chat tab on export</td></tr>
+      <tr><td><code>scripting</code></td><td>Inject the content script that reads the conversation</td></tr>
+      <tr><td><code>storage</code></td><td>Pass data to the Preview &amp; Select page via session storage</td></tr>
+      <tr><td><code>downloads</code></td><td>Save the exported file to the user's downloads folder</td></tr>
+      <tr><td><code>contextMenus</code></td><td>Add the right-click "Export chat" context menu entry</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Contact</h2>
+  <p>For questions or concerns regarding this privacy policy, please open an issue in the <a href="https://github.com/TomSchmidtDev/browser-ai-chat-exporter">GitHub repository</a>.</p>
+
+  <footer>
+    AI Chat Exporter · &copy; 2026 TomSchmidtDev · Licensed under Business Source License 1.1
+  </footer>
+
+</div>
+</body>
+</html>

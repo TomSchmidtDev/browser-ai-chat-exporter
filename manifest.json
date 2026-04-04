@@ -1,14 +1,13 @@
 {
   "manifest_version": 3,
   "name": "AI Chat Exporter",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Export conversations from Claude.ai and ChatGPT with full content, artifacts, and generated files",
   "permissions": [
     "activeTab",
     "storage",
     "downloads",
     "scripting",
-    "tabs",
     "contextMenus"
   ],
   "host_permissions": [

@@ -1,4 +1,4 @@
-1.4.0
+1.4.1
 
 # Versioning scheme: MAJOR.MINOR.BUILD
 # MAJOR — breaking changes
@@ -6,6 +6,9 @@
 # BUILD — any fix or improvement
 
 # Changelog
+# 1.4.1  2026-04-04  Remove overly broad "tabs" permission (activeTab is sufficient)
+#                    Add privacy-policy.html · Add store screenshots (1280x800)
+#                    Add GitHub Actions release workflow
 # 1.4.0  2026-04-04  Markdown table rendering in exported HTML (Claude text blocks)
 # 1.3.4  2026-04-04  Security: sanitize raw HTML blocks (CRIT-2), fix ZIP path
 #                    traversal (HIGH-4), block javascript: URLs in exports (HIGH-6/MED-1)
