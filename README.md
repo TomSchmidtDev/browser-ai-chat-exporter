@@ -205,3 +205,4 @@ Die Extension erkennt die aktive Plattform auf drei Ebenen:
 
 MIT License · Copyright (c) 2026
 # browser-ai-chat-exporter
+# browser-ai-chat-exporter
