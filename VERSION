@@ -1,0 +1,18 @@
+1.3.1
+
+# Versioning scheme: MAJOR.MINOR.BUILD
+# MAJOR — breaking changes
+# MINOR — new feature (new platform, format, UI feature)
+# BUILD — any fix or improvement
+
+# Changelog
+# 1.3.1  2026-03-31  Context menu: right-click → "Chat exportieren" submenu
+#                    (HTML / Markdown / ZIP / PDF / Preview & Select)
+#                    Copilot v1.2.5: improved DOM detection, fallback strategies
+# 1.2.x  2026-03-31  Microsoft Copilot support (m365.cloud.microsoft/chat)
+#                    Copilot bugfixes: scriptor detection, empty markdown-reply
+# 1.1.1  2026-03-30  Gemini support (Angular: user-query/model-response/code-block)
+#                    PDF fix: chrome.tabs.create via background
+#                    Preview & Select: Deselect Tool Output button
+# 1.0.x  2026-03-xx  Claude + ChatGPT export (HTML, MD, ZIP, PDF)
+#                    Preview & Select with per-block checkboxes

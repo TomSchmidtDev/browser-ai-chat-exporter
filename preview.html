@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Chat Exporter — Preview & Select</title>
+<style>
+  :root {
+    --bg: #f4f5f7; --surface: #fff; --border: #e2e4e8;
+    --text: #1a1a2e; --text-sec: #6b7280; --accent: #6366f1;
+    --accent-dim: rgba(99,102,241,0.08); --radius: 10px;
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'SF Mono','Fira Code','Cascadia Code',monospace;
+    --user-bg: #eef2ff; --assist-bg: #fff;
+    --check-size: 18px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:var(--font); line-height:1.6; }
+
+  /* ── Toolbar ── */
+  #toolbar {
+    position: sticky; top: 0; z-index: 100;
+    background: #1e1b4b; color: #fff;
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    flex-wrap: wrap;
+  }
+  #toolbar h1 { font-size: 15px; font-weight: 600; margin-right: 8px; white-space: nowrap; }
+  .toolbar-sep { width: 1px; height: 24px; background: rgba(255,255,255,0.2); flex-shrink:0; }
+  .sel-count { font-size: 13px; color: rgba(255,255,255,0.7); white-space:nowrap; }
+
+  .toolbar-btns { display:flex; gap:6px; margin-left:auto; flex-wrap:wrap; }
+  .tb-btn {
+    display: flex; align-items: center; gap: 5px;
+    padding: 6px 14px; border-radius: 6px; font-size: 13px;
+    font-weight: 500; cursor: pointer; border: none; font-family: inherit;
+    transition: all 0.15s; white-space: nowrap;
+  }
+  .tb-btn.secondary { background: rgba(255,255,255,0.1); color: #fff; }
+  .tb-btn.secondary:hover { background: rgba(255,255,255,0.2); }
+  .tb-btn.primary { background: #6366f1; color: #fff; }
+  .tb-btn.primary:hover { background: #4f46e5; }
+  .tb-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .fmt-select {
+    background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 6px; padding: 5px 10px; font-size: 13px; cursor: pointer;
+    font-family: inherit;
+  }
+  .fmt-select option { background: #1e1b4b; color: #fff; }
+
+  /* ── Layout ── */
+  #main { max-width: 860px; margin: 0 auto; padding: 24px 20px 60px; }
+
+  /* ── Chat meta ── */
+  #chat-meta {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 18px; margin-bottom: 20px;
+    font-size: 13px; color: var(--text-sec);
+    display: flex; gap: 16px; flex-wrap: wrap; align-items: center;
+  }
+  #chat-meta strong { color: var(--text); }
+  .platform-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(99,102,241,0.1); color: var(--accent);
+    padding: 2px 9px; border-radius: 20px; font-size: 12px; font-weight: 600;
+  }
+
+  /* ── Message card ── */
+  .msg-card {
+    background: var(--surface); border: 2px solid var(--border);
+    border-radius: var(--radius); margin-bottom: 10px;
+    transition: border-color 0.15s, opacity 0.15s;
+    position: relative;
+  }
+  .msg-card.user { background: var(--user-bg); }
+  .msg-card.deselected { opacity: 0.38; border-style: dashed; }
+
+  .msg-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px 8px; border-bottom: 1px solid var(--border);
+    cursor: pointer; user-select: none;
+  }
+  .msg-header:hover { background: rgba(0,0,0,0.02); }
+
+  /* Custom checkbox */
+  .msg-check {
+    width: var(--check-size); height: var(--check-size);
+    border: 2px solid #d1d5db; border-radius: 4px;
+    background: #fff; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .msg-check.checked { background: var(--accent); border-color: var(--accent); }
+  .msg-check.checked::after {
+    content: ''; width: 5px; height: 9px;
+    border: 2px solid #fff; border-top: none; border-left: none;
+    transform: rotate(45deg) translate(-1px,-1px);
+    display: block;
+  }
+
+  .role-badge {
+    font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 20px;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .role-badge.user { background: rgba(79,70,229,0.12); color: #4338ca; }
+  .role-badge.assistant { background: rgba(217,70,239,0.12); color: #9d174d; }
+  .msg-timestamp { font-size: 11px; color: var(--text-sec); margin-left: auto; }
+  .msg-summary { font-size: 12px; color: var(--text-sec); margin-left: 4px; flex: 1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .msg-toggle { font-size: 11px; color: var(--text-sec); margin-left: 8px; flex-shrink:0; }
+
+  /* ── Blocks ── */
+  .msg-blocks { padding: 6px 14px 12px; display: flex; flex-direction: column; gap: 4px; }
+
+  .block-row {
+    display: flex; align-items: flex-start; gap: 8px;
+    padding: 5px 8px; border-radius: 6px; cursor: pointer;
+    transition: background 0.1s;
+  }
+  .block-row:hover { background: rgba(0,0,0,0.03); }
+  .block-row.deselected { opacity: 0.35; }
+
+  .block-check {
+    width: 15px; height: 15px; margin-top: 2px;
+    border: 2px solid #d1d5db; border-radius: 3px;
+    background: #fff; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .block-check.checked { background: var(--accent); border-color: var(--accent); }
+  .block-check.checked::after {
+    content: ''; width: 4px; height: 7px;
+    border: 1.5px solid #fff; border-top: none; border-left: none;
+    transform: rotate(45deg) translate(-0.5px,-0.5px); display: block;
+  }
+
+  .block-label { font-size: 13px; color: var(--text); line-height: 1.4; }
+  .block-label code { background: rgba(0,0,0,0.07); padding: 1px 4px; border-radius: 3px; font-family: var(--font-mono); font-size: 0.85em; }
+  .block-type-tag { font-size: 10px; color: var(--text-sec); background: rgba(0,0,0,0.05); padding: 1px 5px; border-radius: 10px; margin-left: 4px; }
+
+  /* ── Spinner ── */
+  #loading { text-align: center; padding: 60px 20px; color: var(--text-sec); font-size: 15px; }
+  #error-msg { background: #fee2e2; color: #991b1b; padding: 16px 20px; border-radius: 8px; margin: 20px; }
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+  <h1>📋 Preview & Select</h1>
+  <div class="toolbar-sep"></div>
+  <span class="sel-count" id="selCount">Loading…</span>
+  <div class="toolbar-btns">
+    <button class="tb-btn secondary" id="btnSelectAll">De-/Select All</button>
+    <button class="tb-btn secondary" id="btnDeselectPrompts">De-/Select All Prompts</button>
+    <button class="tb-btn secondary" id="btnDeselectTools">De-/Select Tool Output</button>
+    <div class="toolbar-sep"></div>
+    <select class="fmt-select" id="fmtSelect">
+      <option value="html">HTML</option>
+      <option value="markdown">Markdown</option>
+      <option value="zip">ZIP</option>
+      <option value="pdf">PDF</option>
+    </select>
+    <button class="tb-btn primary" id="exportBtn">
+      ⬇ Export Selected
+    </button>
+  </div>
+</div>
+
+<div id="main">
+  <div id="loading">Loading chat data…</div>
+  <div id="error-msg" style="display:none"></div>
+  <div id="chat-meta" style="display:none"></div>
+  <div id="messages"></div>
+</div>
+
+<!-- All shared modules bundled inline -->
+<script src="shared/utils.js"></script>
+<script src="shared/widget-css.js"></script>
+<script src="shared/html-template.js"></script>
+<script src="shared/exporters/markdown.js"></script>
+<script src="shared/exporters/html.js"></script>
+<script src="shared/exporters/zip.js"></script>
+<script src="jszip.min.js"></script>
+<script src="preview.js"></script>
+</body>
+</html>
