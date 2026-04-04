@@ -1,51 +1,53 @@
 # AI Chat Exporter
 
-Browser-Extension zum Exportieren von Gesprächen aus **Claude**, **ChatGPT**, **Gemini** und **Microsoft Copilot** — als vollständige, eigenständige Dateien die ohne Account, ohne Plattform und ohne Internetverbindung funktionieren.
+> Deutsche Version: [README.de.md](README.de.md)
 
-**Version:** 1.3.2 · **Browser:** Chrome, Edge
+Browser extension for exporting conversations from **Claude**, **ChatGPT**, **Gemini**, and **Microsoft Copilot** — as complete, standalone files that work without an account, without the platform, and without an internet connection.
 
----
-
-## Unterstützte Plattformen
-
-| Plattform | URL | Methode | Hinweis |
-|-----------|-----|---------|---------|
-| 🔶 **Claude** | claude.ai | API + DOM-Fallback | Vollständiger Funktionsumfang inkl. Artifacts, Thinking, Tool-Calls |
-| 🟢 **ChatGPT** | chatgpt.com | DOM-Scraping | Text, Code, Tabellen — keine interaktiven Widgets |
-| 🔵 **Gemini** | gemini.google.com | DOM-Scraping | Text, Code, Tabellen |
-| 🪟 **Microsoft Copilot** | m365.cloud.microsoft/chat | DOM-Scraping | Text, Code, Tabellen |
-
-> **Hinweis:** Der Funktionsumfang variiert je nach Plattform. Claude nutzt die offizielle API und liefert strukturierte Daten inkl. aller Block-Typen. Bei ChatGPT, Gemini und Copilot werden die Inhalte aus dem gerenderten DOM ausgelesen — das bedeutet Text und Code werden zuverlässig exportiert, plattformspezifische Inhalte wie Artifacts oder interaktive Elemente stehen dort nicht zur Verfügung.
+**Version:** 1.3.4 · **Browser:** Chrome, Edge
 
 ---
 
-## Warum diese Extension?
+## Supported Platforms
 
-### Kein Vendor-Lock-in beim Teilen
+| Platform | URL | Method | Notes |
+|----------|-----|--------|-------|
+| 🔶 **Claude** | claude.ai | API + DOM fallback | Full feature set incl. Artifacts, Thinking, Tool Calls |
+| 🟢 **ChatGPT** | chatgpt.com | DOM scraping | Text, code, tables — no interactive widgets |
+| 🔵 **Gemini** | gemini.google.com | DOM scraping | Text, code, tables |
+| 🪟 **Microsoft Copilot** | m365.cloud.microsoft/chat | DOM scraping | Text, code, tables |
 
-Geteilte Chats sind plattformgebunden und schließen viele Empfänger aus:
+> **Note:** Feature coverage varies by platform. Claude uses the official API and delivers structured data including all block types. For ChatGPT, Gemini, and Copilot, content is read from the rendered DOM — meaning text and code are reliably exported, while platform-specific content like Artifacts or interactive elements is not available.
 
-- **ChatGPT Enterprise** — ein geteilter Chat ist nur für Empfänger zugänglich, die im selben Unternehmens-Account laufen.
-- **Claude** — geteilte Chats zeigen keine Artifacts und visuellen Inhalte, wenn der Empfänger keinen Claude-Account besitzt.
+---
 
-Der Export funktioniert für **jeden** — als einfache HTML-, ZIP-, Markdown- oder PDF-Datei, ohne Account, ohne Login, ohne Abhängigkeit von der Plattform.
+## Why this extension?
 
-### Langzeitarchiv
+### No vendor lock-in when sharing
 
-Chats mit wichtigen Entscheidungen, Code-Reviews, Analysen oder Recherchen bleiben als eigenständige Dateien dauerhaft erhalten — unabhängig davon ob das Konto noch existiert, das Abo ausläuft oder die Plattform ihren Dienst einstellt.
+Shared chats are platform-bound and exclude many recipients:
 
-### Vollständiger Inhalt
+- **ChatGPT Enterprise** — a shared chat is only accessible to recipients in the same company account.
+- **Claude** — shared chats do not show Artifacts and visual content if the recipient has no Claude account.
 
-Nicht nur der Text: Artifacts (interaktive React-Apps, Diagramme, SVGs), generierte Dateien, Code-Blöcke mit Syntax-Highlighting und Tabellen werden vollständig exportiert und bleiben im Export funktionsfähig.
+The export works for **everyone** — as a simple HTML, ZIP, Markdown, or PDF file, without an account, without login, independent of the platform.
 
-### Vier Formate für jeden Zweck
+### Long-term archive
 
-| Format | Ideal für |
+Chats containing important decisions, code reviews, analyses, or research are preserved as standalone files — regardless of whether the account still exists, the subscription expires, or the platform shuts down.
+
+### Complete content
+
+Not just text: Artifacts (interactive React apps, diagrams, SVGs), generated files, code blocks with syntax highlighting, and tables are fully exported and remain functional in the export.
+
+### Four formats for every purpose
+
+| Format | Ideal for |
 |--------|-----------|
-| **HTML** | Teilen mit Kollegen, Einbetten in Dokumentation, vollständig offline nutzbar |
-| **ZIP** | Alle Dateien und Artifacts einzeln zugänglich, direkt weiterverwendbar |
-| **Markdown** | Obsidian, Notion, Confluence, Git-Repositories |
-| **PDF** | Formelle Dokumentation, Meetings, Archivierung |
+| **HTML** | Sharing with colleagues, embedding in documentation, fully offline |
+| **ZIP** | All files and Artifacts individually accessible, ready to use |
+| **Markdown** | Obsidian, Notion, Confluence, Git repositories |
+| **PDF** | Formal documentation, meetings, archiving |
 
 ---
 
@@ -53,156 +55,131 @@ Nicht nur der Text: Artifacts (interaktive React-Apps, Diagramme, SVGs), generie
 
 ### Chrome / Edge
 
-1. ZIP herunterladen und **entpacken**
-2. `chrome://extensions` öffnen (oder `edge://extensions`)
-3. **Entwicklermodus** aktivieren (Schalter oben rechts)
-4. **Entpackte Erweiterung laden** klicken
-5. Den entpackten Ordner `ai-chat-exporter` auswählen
-6. Das Extension-Icon erscheint in der Toolbar
+1. Download the ZIP and **unpack** it
+2. Open `chrome://extensions` (or `edge://extensions`)
+3. Enable **Developer mode** (toggle in the top right)
+4. Click **Load unpacked**
+5. Select the unpacked `ai-chat-exporter` folder
+6. The extension icon appears in the toolbar
 
-> ⚠️ **Wichtig:** Der Ordner, aus dem die Extension geladen wurde, darf **nicht verschoben oder gelöscht** werden. Chrome lädt die Extension-Dateien direkt aus diesem Verzeichnis — wird er entfernt, funktioniert die Extension nicht mehr und muss neu installiert werden.
+> **Important:** The folder from which the extension was loaded must **not be moved or deleted**. Chrome loads the extension files directly from this directory — if it is removed, the extension will stop working and must be reinstalled.
 
-> **Nach einem Update:** Auf der Extensions-Seite auf das Reload-Symbol klicken, damit neue Kontextmenüeinträge und Berechtigungen aktiv werden.
-
----
-
-## Verwendung
-
-### Variante 1 — Toolbar-Icon
-
-1. Einen Chat auf einer unterstützten Plattform öffnen
-2. Extension-Icon in der Toolbar klicken
-3. Format wählen: **HTML**, **ZIP**, **Markdown** oder **PDF**
-4. **Export Chat** klicken — oder **Preview & Select** für selektiven Export
-
-### Variante 2 — Rechtsklick-Kontextmenü
-
-Rechtsklick auf die Seite → **„Chat exportieren"**:
-
-- 📄 Als HTML exportieren
-- 📝 Als Markdown exportieren
-- 📦 Als ZIP exportieren
-- 🖨️ Als PDF exportieren
-- 📋 Preview & Select…
-
-Der Export startet sofort — kein Popup nötig.
-
-### Variante 3 — Preview & Select
-
-Öffnet einen eigenen Tab mit der vollständigen Gesprächsansicht:
-
-- **Checkboxen pro Nachricht** und **pro Block** (Text, Code, Artifact, Bild, Thinking, Tool-Output etc.)
-- Alles standardmäßig ausgewählt
-- Schnellauswahl-Buttons:
-  - **Select All / Deselect All** — alle Nachrichten und Blöcke
-  - **Deselect All Prompts** — nur die eigenen Fragen abwählen
-  - **Deselect Tool Output** — Thinking, Tool-Calls, Web-Suche etc. abwählen
-- Format wählen und **Export Selected** klicken
+> **After an update:** Click the reload icon on the extensions page so that new context menu entries and permissions take effect.
 
 ---
 
-## Unterstützte Inhalte nach Plattform
+## Usage
 
-| Inhaltstyp | Claude | ChatGPT | Gemini | Copilot |
-|------------|:------:|:-------:|:------:|:-------:|
-| Text mit Formatierung | ✅ | ✅ | ✅ | ✅ |
-| Code-Blöcke | ✅ | ✅ | ✅ | ✅ |
-| Tabellen | ✅ | ✅ | ✅ | ✅ |
-| Artifacts (React, HTML, SVG) | ✅ interaktiv | — | — | — |
-| Visualizer-Widgets | ✅ | — | — | — |
-| Thinking Blocks | ✅ | — | — | — |
-| Tool-Calls / Web-Suche | ✅ optional | — | — | — |
-| Eingebettete Bilder | ✅ | — | — | — |
-| Generierte Dateien | ✅ | — | — | — |
-| Timestamps & Metadaten | ✅ | — | — | — |
+### Option 1 — Toolbar icon
 
-*Die Einschränkungen bei ChatGPT, Gemini und Copilot sind technisch bedingt: Diese Plattformen stellen keine zugängliche API für den Abruf von Chatverläufen bereit, weshalb der Inhalt aus dem gerenderten DOM ausgelesen wird.*
+1. Open a chat on a supported platform
+2. Click the extension icon in the toolbar
+3. Choose a format: **HTML**, **ZIP**, **Markdown**, or **PDF**
+4. Click **Export Chat** — or **Preview & Select** for selective export
+
+### Option 2 — Right-click context menu
+
+Right-click on the page → **"Chat exportieren"**:
+
+- Export as HTML
+- Export as Markdown
+- Export as ZIP
+- Export as PDF
+- Preview & Select…
+
+The export starts immediately — no popup needed.
+
+### Option 3 — Preview & Select
+
+Opens a dedicated tab with the full conversation view:
+
+- **Checkboxes per message** and **per block** (text, code, artifact, image, thinking, tool output, etc.)
+- Everything selected by default
+- Quick selection buttons:
+  - **Select All / Deselect All** — all messages and blocks
+  - **Deselect All Prompts** — deselect only your own questions
+  - **Deselect Tool Output** — deselect thinking, tool calls, web searches, etc.
+- Choose format and click **Export Selected**
 
 ---
 
-## Datenschutz
+## Supported content by platform
 
-- Alle Verarbeitung findet **lokal im Browser** statt — es wird keine separate Cloud-Infrastruktur verwendet.
-- Es werden **keine Daten an Dritte oder externe Server** gesendet.
-- **Claude (API-Modus):** Beim Export wird die bestehende Browser-Session genutzt, um die Konversation über die Claude-API abzurufen. Dabei werden Session-Informationen (Authentifizierungstoken) an die Claude-Plattform gesendet — dies sind jedoch dieselben Informationen, die der Browser bereits beim normalen Benutzen des Chats überträgt. Es werden keine zusätzlichen Daten preisgegeben, die nicht ohnehin schon Teil der laufenden Session sind.
-- **ChatGPT, Gemini, Copilot (DOM-Scraping):** Keinerlei Netzwerkanfragen — der Inhalt wird ausschließlich aus dem bereits im Browser geladenen DOM gelesen.
-- `chrome.storage.session` für die Datenweitergabe an die Preview-Seite — wird beim Schließen des Browsers automatisch gelöscht.
-- Die Extension aktiviert sich nur auf den vier unterstützten Domains und ist auf allen anderen Seiten vollständig inaktiv.
+| Content type | Claude | ChatGPT | Gemini | Copilot |
+|--------------|:------:|:-------:|:------:|:-------:|
+| Text with formatting | ✅ | ✅ | ✅ | ✅ |
+| Code blocks | ✅ | ✅ | ✅ | ✅ |
+| Tables | ✅ | ✅ | ✅ | ✅ |
+| Artifacts (React, HTML, SVG) | ✅ interactive | — | — | — |
+| Visualizer widgets | ✅ | — | — | — |
+| Thinking blocks | ✅ | — | — | — |
+| Tool calls / web search | ✅ optional | — | — | — |
+| Embedded images | ✅ | — | — | — |
+| Generated files | ✅ | — | — | — |
+| Timestamps & metadata | ✅ | — | — | — |
+
+*The limitations for ChatGPT, Gemini, and Copilot are technical: these platforms do not provide an accessible API for retrieving chat histories, so content is read from the rendered DOM.*
 
 ---
 
-## Architektur
+## Privacy
+
+- All processing happens **locally in the browser** — no separate cloud infrastructure is used.
+- **No data is sent to third parties or external servers.**
+- **Claude (API mode):** During export, the existing browser session is used to fetch the conversation via the Claude API. Session information (authentication tokens) is sent to the Claude platform — but these are the same credentials the browser already transmits during normal use. No additional data is disclosed beyond what is already part of the active session.
+- **ChatGPT, Gemini, Copilot (DOM scraping):** No network requests — content is read exclusively from the already-loaded DOM.
+- `chrome.storage.session` is used to pass data to the preview page — automatically cleared when the browser is closed.
+- The extension activates only on the four supported domains and is completely inactive on all other sites.
+
+---
+
+## Architecture
 
 ```
 ai-chat-exporter/
-├── manifest.json              v1.3.2, permissions: activeTab, storage,
+├── manifest.json              v1.3.4, permissions: activeTab, storage,
 │                              downloads, scripting, tabs, contextMenus
-├── background.js              Downloads, Kontextmenü, Tab-Öffnung für PDF
-├── popup.html / popup.js      UI, Plattformerkennung, Export-Orchestrierung
+├── background.js              Downloads, context menu, tab opening for PDF
+├── popup.html / popup.js      UI, platform detection, export orchestration
 ├── popup.css
 ├── preview.html / preview.js  Preview & Select (chrome.storage.session)
-│                              Unterstützt ?autoexport=<format> für Direktexport
-│                              aus dem Kontextmenü
+│                              Supports ?autoexport=<format> for direct export
+│                              from the context menu
 │
 ├── platforms/
 │   ├── claude/
-│   │   ├── injector.js        Page Context: fetch-Patch, Org-ID, Auth-API
-│   │   └── content.js         Bridge + API-Normalisierung + DOM-Fallback
+│   │   ├── injector.js        Page context: fetch patch, org ID, auth API
+│   │   └── content.js         Bridge + API normalisation + DOM fallback
 │   ├── chatgpt/
-│   │   └── content.js         DOM-Scraping (CodeMirror, Tabellen als HTML-Sentinel)
+│   │   └── content.js         DOM scraping (CodeMirror, tables as HTML sentinel)
 │   ├── gemini/
-│   │   └── content.js         DOM-Scraping (Angular: user-query, model-response,
-│   │                          code-block mit code-block-decoration)
+│   │   └── content.js         DOM scraping (Angular: user-query, model-response)
 │   └── copilot/
-│       └── content.js         DOM-Scraping (Fluent UI: fai-UserMessage,
+│       └── content.js         DOM scraping (Fluent UI: fai-UserMessage,
 │                              fai-CopilotMessage, scriptor-component-code-block)
 │
 └── shared/
     ├── utils.js               escHtml, markdownToHtml, formatFileSize
-    ├── widget-css.js          CSS-Variablen + Artifact/Visualizer-Builder
-    ├── html-template.js       Export-HTML-Template mit Copy-Button, Dark Mode
+    ├── widget-css.js          CSS variables + artifact/visualizer builder
+    ├── html-template.js       Export HTML template with copy button, dark mode
     └── exporters/
-        ├── html.js            HTML & PDF Exporter
-        ├── markdown.js        Markdown Exporter
-        └── zip.js             ZIP Exporter (2-Pass: Artifacts, Files, Images)
+        ├── html.js            HTML & PDF exporter
+        ├── markdown.js        Markdown exporter
+        └── zip.js             ZIP exporter (2-pass: artifacts, files, images)
 ```
 
 ---
 
-## Plattformerkennung
+## Adding a new platform
 
-Die Extension erkennt die aktive Plattform auf drei Ebenen:
-
-1. **Manifest-Matching** — Chrome lädt automatisch nur den zuständigen Content Script basierend auf der URL (`claude.ai` → `platforms/claude/content.js` usw.)
-2. **URL-Check im Popup** — `detectPlatform(url)` zeigt das korrekte Badge und aktiviert den Export-Button
-3. **Kontextmenü** — `documentUrlPatterns` blendet den Menüeintrag auf nicht unterstützten Seiten aus
-
----
-
-## Neue Plattform hinzufügen
-
-1. `platforms/<name>/content.js` erstellen
-2. In `manifest.json` unter `content_scripts` und `host_permissions` eintragen
-3. In `background.js` → `SUPPORTED_URLS` ergänzen
-4. In `popup.js` → `detectPlatform()` und `platformLabel()` ergänzen
-5. In `shared/exporters/html.js` → Badge-Mapping ergänzen
+1. Create `platforms/<name>/content.js`
+2. Add to `manifest.json` under `content_scripts` and `host_permissions`
+3. Add to `background.js` → `SUPPORTED_URLS`
+4. Add to `popup.js` → `detectPlatform()` and `platformLabel()`
+5. Add badge mapping in `shared/exporters/html.js`
 
 ---
 
-## Versionshistorie
+## License
 
-| Version | Datum | Änderungen |
-|---------|-------|------------|
-| **1.3.2** | 2026-03-31 | Plattformliste in Popup-Fehlermeldung · README aktualisiert |
-| **1.3.1** | 2026-03-31 | Kontextmenü (Rechtsklick → „Chat exportieren") |
-| **1.2.x** | 2026-03-31 | Microsoft Copilot Support (m365.cloud.microsoft) |
-| **1.1.1** | 2026-03-30 | Gemini Support · PDF-Fix · Preview & Select Buttons |
-| **1.0.x** | 2026-03-xx | Claude + ChatGPT · HTML/MD/ZIP/PDF · Preview & Select |
-
----
-
-## Lizenz
-
-MIT License · Copyright (c) 2026
-# browser-ai-chat-exporter
-# browser-ai-chat-exporter
+Business Source License 1.1 — free for personal, non-commercial, and internal business use. Converts to Apache 2.0 on 2031-04-04. See [LICENSE.md](LICENSE.md) for details.
