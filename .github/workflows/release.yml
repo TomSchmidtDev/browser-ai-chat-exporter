@@ -58,10 +58,57 @@ jobs:
 
       - name: Upload to Chrome Web Store
         if: steps.flags.outputs.is_preview == 'false'
-        uses: fregante/chrome-webstore-upload-action@v3
-        with:
-          extension-id: ${{ secrets.CWS_EXTENSION_ID }}
-          client-id: ${{ secrets.CWS_CLIENT_ID }}
-          client-secret: ${{ secrets.CWS_CLIENT_SECRET }}
-          refresh-token: ${{ secrets.CWS_REFRESH_TOKEN }}
-          upload-only: false
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          CWS_EXTENSION_ID: ${{ secrets.CWS_EXTENSION_ID }}
+          CWS_CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
+          CWS_CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET }}
+          CWS_REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN }}
+        run: |
+          # 1 — Obtain a short-lived access token via the refresh token
+          ACCESS_TOKEN=$(curl -s -X POST https://oauth2.googleapis.com/token \
+            -d "client_id=${CWS_CLIENT_ID}" \
+            -d "client_secret=${CWS_CLIENT_SECRET}" \
+            -d "refresh_token=${CWS_REFRESH_TOKEN}" \
+            -d "grant_type=refresh_token" \
+            | jq -r '.access_token')
+
+          if [ -z "$ACCESS_TOKEN" ] || [ "$ACCESS_TOKEN" = "null" ]; then
+            echo "Failed to obtain access token" >&2
+            exit 1
+          fi
+
+          # 2 — Upload the new ZIP (replaces the existing draft)
+          UPLOAD_RESPONSE=$(curl -s \
+            -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+            -H "x-goog-api-version: 2" \
+            -X PUT \
+            -T "ai-chat-exporter-${VERSION}.zip" \
+            "https://www.googleapis.com/upload/chromewebstore/v1.1/items/${CWS_EXTENSION_ID}")
+
+          echo "Upload response: $UPLOAD_RESPONSE"
+
+          UPLOAD_STATE=$(echo "$UPLOAD_RESPONSE" | jq -r '.uploadState // .error.message // "UNKNOWN"')
+          if [ "$UPLOAD_STATE" != "SUCCESS" ]; then
+            echo "Upload failed with state: $UPLOAD_STATE" >&2
+            exit 1
+          fi
+
+          # 3 — Publish to all users
+          PUBLISH_RESPONSE=$(curl -s \
+            -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+            -H "x-goog-api-version: 2" \
+            -H "Content-Length: 0" \
+            -X POST \
+            "https://www.googleapis.com/chromewebstore/v1.1/items/${CWS_EXTENSION_ID}/publish")
+
+          echo "Publish response: $PUBLISH_RESPONSE"
+
+          PUBLISH_STATUS=$(echo "$PUBLISH_RESPONSE" | jq -r '.status[0] // .error.message // "UNKNOWN"')
+          echo "Publish status: $PUBLISH_STATUS"
+          if [ "$PUBLISH_STATUS" = "ITEM_PENDING_REVIEW" ] || [ "$PUBLISH_STATUS" = "OK" ]; then
+            echo "Successfully submitted for review."
+          else
+            echo "Publish may have failed — check the response above." >&2
+            exit 1
+          fi
