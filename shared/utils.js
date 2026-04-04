@@ -54,8 +54,8 @@ function markdownToHtml(md) {
   html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
 
   // Links
-  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g,
-    '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, text, url) =>
+    `<a href="${safeUrl(url)}" target="_blank" rel="noopener">${text}</a>`);
 
   // Horizontal rules
   html = html.replace(/^[-*]{3,}$/gm, '<hr>');
@@ -85,6 +85,26 @@ function markdownToHtml(md) {
   html = html.replace(/<p>\s*(<hr>)\s*<\/p>/g, '$1');
 
   return html;
+}
+
+/** Allow only http/https URLs in href/src attributes — blocks javascript: and data: */
+function safeUrl(url) {
+  if (!url) return '#';
+  try {
+    const u = new URL(url);
+    return (u.protocol === 'https:' || u.protocol === 'http:') ? url : '#';
+  } catch { return '#'; }
+}
+
+/**
+ * Strip executable content from raw scraped HTML (e.g. ChatGPT tables).
+ * Removes <script> blocks and inline event handlers; leaves structure intact.
+ */
+function sanitizeHtmlBlock(html) {
+  if (!html) return '';
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/\s+on\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]*)/gi, '');
 }
 
 function formatFileSize(bytes) {

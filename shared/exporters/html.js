@@ -31,7 +31,7 @@ function renderMessagesToHtml(data, options, artifactUrlResolver) {
 
         case 'html':
           // Raw HTML block (e.g. tables passed through from ChatGPT DOM)
-          contentHtml += `<div class="html-block">${block.html}</div>`;
+          contentHtml += `<div class="html-block">${sanitizeHtmlBlock(block.html)}</div>`;
           break;
 
         case 'code':
@@ -163,7 +163,7 @@ function renderMessagesToHtml(data, options, artifactUrlResolver) {
 
         case 'web_fetch':
           if (!options.includeToolUse) break;
-          contentHtml += `<div class="tool-block"><div class="tool-header">🌐 Fetch: <a href="${escAttr(block.url)}" target="_blank" rel="noopener">${escHtml(block.url)}</a></div></div>`;
+          contentHtml += `<div class="tool-block"><div class="tool-header">🌐 Fetch: <a href="${escAttr(safeUrl(block.url))}" target="_blank" rel="noopener">${escHtml(block.url)}</a></div></div>`;
           break;
 
         case 'image_search':

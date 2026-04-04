@@ -65,7 +65,7 @@ async function exportZip(data, options) {
           break;
 
         case 'html':
-          contentHtml += `<div class="html-block">${block.html}</div>`;
+          contentHtml += `<div class="html-block">${sanitizeHtmlBlock(block.html)}</div>`;
           break;
 
         case 'code':
@@ -144,7 +144,11 @@ async function exportZip(data, options) {
         case 'file_creation': {
           if (!options.includeFiles) break;
           const filePath    = block.path || block.fileName || `file_${Date.now()}`;
-          const safeRelPath = filePath.replace(/^[./\\]+/, '').replace(/\\/g, '/');
+          const safeRelPath = filePath
+            .replace(/\\/g, '/')
+            .split('/')
+            .filter(seg => seg && seg !== '.' && seg !== '..')
+            .join('/');
           const zipPath     = `files/${safeRelPath}`;
           if (block.content) zip.file(zipPath, block.content);
 
@@ -163,7 +167,7 @@ async function exportZip(data, options) {
           contentHtml += `<div class="file-block present-files">
             <div class="file-header">📥 Download</div>
             <ul class="present-files-list">${(block.paths || []).map(p => {
-              const safe = p.replace(/^[./\\]+/, '').replace(/\\/g, '/');
+              const safe = p.replace(/\\/g, '/').split('/').filter(s => s && s !== '.' && s !== '..').join('/');
               const name = p.split('/').pop() || p;
               return `<li><a href="files/${safe}" target="_blank">⬇ ${escHtml(name)}</a> <span class="file-tag">${escHtml(p)}</span></li>`;
             }).join('')}</ul>
@@ -193,7 +197,7 @@ async function exportZip(data, options) {
 
         case 'web_fetch':
           if (!options.includeToolUse) break;
-          contentHtml += `<div class="tool-block"><div class="tool-header">🌐 Fetch: <a href="${escAttr(block.url)}" target="_blank" rel="noopener">${escHtml(block.url)}</a></div></div>`;
+          contentHtml += `<div class="tool-block"><div class="tool-header">🌐 Fetch: <a href="${escAttr(safeUrl(block.url))}" target="_blank" rel="noopener">${escHtml(block.url)}</a></div></div>`;
           break;
 
         case 'file_edit':
