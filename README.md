@@ -17,6 +17,8 @@ Browser extension for exporting conversations from **Claude**, **ChatGPT**, **Ge
 | 🔵 **Gemini** | gemini.google.com | DOM scraping | Text, code, tables |
 | 🪟 **Microsoft Copilot** | m365.cloud.microsoft/chat | DOM scraping | Text, code, tables |
 
+![Export dialog](screenshots/export-dialog.jpeg)
+
 > **Note:** Feature coverage varies by platform. Claude uses the official API and delivers structured data including all block types. For ChatGPT, Gemini, and Copilot, content is read from the rendered DOM — meaning text and code are reliably exported, while platform-specific content like Artifacts or interactive elements is not available.
 
 ---
@@ -90,6 +92,8 @@ Right-click on the page → **"Chat exportieren"**:
 The export starts immediately — no popup needed.
 
 ### Option 3 — Preview & Select
+
+![Preview & Select](screenshots/preview-select.jpeg)
 
 Opens a dedicated tab with the full conversation view:
 
