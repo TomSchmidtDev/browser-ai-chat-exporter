@@ -70,6 +70,22 @@ Opens in a new tab. Reads chat data from `chrome.storage.session` (`cce_preview_
 4. Add to `popup.js` → `detectPlatform()` and `platformLabel()`
 5. Add badge mapping in `shared/exporters/html.js`
 
+## Versioning policy
+
+Version format: `MAJOR.MINOR.BUILD` — defined in both `manifest.json` (`"version"`) and `VERSION`.
+
+| Change type | Version component | Examples |
+|-------------|-------------------|---------|
+| Breaking change or large new feature | **MAJOR** (`+1.0.0`) | New platform support, redesigned data model |
+| New feature | **MINOR** (`+0.1.0`) | New export format, new block type rendered, new UI feature |
+| Bug fix or improvement | **BUILD** (`+0.0.1`) | Security fix, rendering fix, performance improvement |
+
+**Rules:**
+- Bump the version in **both** `manifest.json` and the `VERSION` file in the same commit as the change.
+- Add a changelog entry to `VERSION` in the format: `# X.Y.Z  YYYY-MM-DD  description`
+- When MAJOR bumps, reset MINOR and BUILD to 0. When MINOR bumps, reset BUILD to 0.
+- Each logical change gets its own bump — do not batch multiple changes into a single bump unless they ship in the same commit.
+
 ## Security policies
 
 These policies apply to all code changes in this repository. They were established after a security review (2026-04-04) and must be maintained in future sessions.

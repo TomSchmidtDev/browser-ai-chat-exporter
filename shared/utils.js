@@ -57,6 +57,29 @@ function markdownToHtml(md) {
   html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, text, url) =>
     `<a href="${safeUrl(url)}" target="_blank" rel="noopener">${text}</a>`);
 
+  // Tables — detect pipe-delimited blocks with a separator row (|---|---|)
+  // Runs after inline formatting so cell content already has <strong>, <code> etc.
+  html = html.replace(/((?:(?:^|\n)\|[^\n]+)+)/g, (match) => {
+    const lines = match.trim().split('\n').map(l => l.trim()).filter(l => l.startsWith('|'));
+    if (lines.length < 2) return match;
+    // Second line must be a separator: only |, -, :, spaces
+    if (!/^\|[-:\s|]+\|$/.test(lines[1])) return match;
+
+    const parseRow = (line) => line.split('|').slice(1, -1).map(c => c.trim());
+    const headers = parseRow(lines[0]);
+    const bodyRows = lines.slice(2);
+
+    let t = '<table><thead><tr>';
+    t += headers.map(h => `<th>${h}</th>`).join('');
+    t += '</tr></thead><tbody>';
+    for (const row of bodyRows) {
+      const cells = parseRow(row);
+      t += '<tr>' + cells.map(c => `<td>${c}</td>`).join('') + '</tr>';
+    }
+    t += '</tbody></table>';
+    return '\n' + t + '\n';
+  });
+
   // Horizontal rules
   html = html.replace(/^[-*]{3,}$/gm, '<hr>');
 
@@ -83,6 +106,8 @@ function markdownToHtml(md) {
   html = html.replace(/<p>\s*(<pre)/g,         '$1');
   html = html.replace(/(<\/pre>)\s*<\/p>/g,    '$1');
   html = html.replace(/<p>\s*(<hr>)\s*<\/p>/g, '$1');
+  html = html.replace(/<p>\s*(<table>)/g,      '$1');
+  html = html.replace(/(<\/table>)\s*<\/p>/g,  '$1');
 
   return html;
 }

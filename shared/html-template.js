@@ -114,10 +114,11 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
     padding:12px; border-radius:6px; overflow-x:auto; font-size:13px; }
   blockquote { border-left:3px solid var(--border); padding-left:12px; color:var(--text-sec); margin:8px 0; }
   .html-block { margin:10px 0; overflow-x:auto; }
-  .html-block table { border-collapse:collapse; font-size:14px; width:auto; max-width:100%; }
-  .html-block th, .html-block td { border:1px solid var(--border); padding:7px 12px; text-align:left; vertical-align:top; }
-  .html-block th { background:rgba(127,127,127,0.08); font-weight:600; font-size:13px; }
-  .html-block tr:nth-child(even) td { background:rgba(127,127,127,0.04); }
+  .html-block table, .text-block table { border-collapse:collapse; font-size:14px; width:auto; max-width:100%; margin:10px 0; }
+  .html-block th, .html-block td,
+  .text-block th, .text-block td { border:1px solid var(--border); padding:7px 12px; text-align:left; vertical-align:top; }
+  .html-block th, .text-block th { background:rgba(127,127,127,0.08); font-weight:600; font-size:13px; }
+  .html-block tr:nth-child(even) td, .text-block tr:nth-child(even) td { background:rgba(127,127,127,0.04); }
   .html-block code { background:rgba(127,127,127,0.15); padding:1px 4px; border-radius:3px; font-family:var(--font-mono); font-size:0.87em; }
   @media print {
     .no-print { display:none!important; }
