@@ -128,12 +128,47 @@ Der Export startet sofort — kein Popup nötig.
 
 ## Datenschutz
 
-- Alle Verarbeitung findet **lokal im Browser** statt — es wird keine separate Cloud-Infrastruktur verwendet.
-- Es werden **keine Daten an Dritte oder externe Server** gesendet.
-- **Claude (API-Modus):** Beim Export wird die bestehende Browser-Session genutzt, um die Konversation über die Claude-API abzurufen. Dabei werden Session-Informationen (Authentifizierungstoken) an die Claude-Plattform gesendet — dies sind jedoch dieselben Informationen, die der Browser bereits beim normalen Benutzen des Chats überträgt. Es werden keine zusätzlichen Daten preisgegeben, die nicht ohnehin schon Teil der laufenden Session sind.
-- **ChatGPT, Gemini, Copilot (DOM-Scraping):** Keinerlei Netzwerkanfragen — der Inhalt wird ausschließlich aus dem bereits im Browser geladenen DOM gelesen.
-- `chrome.storage.session` für die Datenweitergabe an die Preview-Seite — wird beim Schließen des Browsers automatisch gelöscht.
-- Die Extension aktiviert sich nur auf den vier unterstützten Domains und ist auf allen anderen Seiten vollständig inaktiv.
+Alle Verarbeitung findet **lokal im Browser** statt. Es werden keine Daten an den Entwickler übermittelt, kein Analytics, kein Tracking.
+
+### ChatGPT, Gemini, Microsoft Copilot
+
+Diese Plattformen werden aus dem **bereits gerenderten DOM** ausgelesen — die Extension macht dabei keinerlei Netzwerkanfragen. Der Inhalt wird aus dem verarbeitet, was der Browser bereits geladen hat, und vollständig im Arbeitsspeicher verarbeitet.
+
+### Claude — was beim Export gesendet wird
+
+Claude nutzt seine offizielle API, um vollständige und strukturierte Exportdaten zu liefern (inkl. Artifacts, Thinking-Blöcke und generierte Dateien). Dazu stellt die Extension im Namen des angemeldeten Nutzers authentifizierte Anfragen an `claude.ai`.
+
+**Was gesendet wird — und wohin:**
+
+Alle Anfragen gehen ausschließlich an `claude.ai`. Es werden keine Daten an einen anderen Empfänger übermittelt.
+
+| Anfrage | Endpunkt | Zweck |
+|---------|----------|-------|
+| GET | `/api/organizations/{orgId}/chat_conversations/{id}?tree=True&rendering_mode=messages&render_all_tools=true` | Vollständige Konversationsdaten abrufen |
+| GET | `/api/bootstrap` oder `/api/organizations` | Organisations-ID ermitteln (nur wenn sie nicht bereits aus einer abgefangenen Seitenanfrage bekannt ist) |
+| GET | `/api/share/{id}` | Geteilte Konversationen abrufen (keine Authentifizierung erforderlich) |
+| GET | Bild-URL auf `claude.ai` | Eingebettete Bilder als Base64 abrufen (nur wenn Option „Bilder einbetten" aktiviert ist) |
+
+**Was mit jeder Anfrage gesendet wird:**
+
+Die Anfragen verwenden die bestehenden Session-Cookies des Browsers für `claude.ai` — dieselben Cookies, die bei jeder normalen Seiteninteraktion übertragen werden. Es werden keine zusätzlichen Zugangsdaten von der Extension ausgelesen, gespeichert oder weitergeleitet.
+
+**Was mit den Daten passiert:**
+
+```
+claude.ai API  →  Browser-Arbeitsspeicher  →  lokale Exportdatei (HTML / ZIP / MD / PDF)
+```
+
+Die Konversationsdaten werden in den Browser-Arbeitsspeicher geladen, in das gewählte Exportformat umgewandelt und über den Download-Dialog des Browsers als lokale Datei gespeichert. Sie werden zu keinem Zeitpunkt hochgeladen, weitergeleitet oder außerhalb der aktuellen Browser-Session zwischengespeichert. `chrome.storage.session` dient ausschließlich der Datenübergabe an den Preview-&-Select-Tab — und wird beim Schließen des Browsers automatisch gelöscht.
+
+**Was die Extension nicht tut:**
+
+- Liest, speichert oder überträgt keinen Claude-API-Key oder kein Passwort
+- Verändert keine Konversationen und sendet keine Schreibanfragen
+- Erfasst keine Nutzungsdaten oder Statistiken
+- Lädt keine externen Skripte oder Ressourcen in die Extension selbst (CDN-Bibliotheken werden ausschließlich in den sandboxierten iframes exportierter Artifact-Dateien referenziert)
+
+Die Extension aktiviert sich nur auf den vier unterstützten Domains und ist auf allen anderen Seiten vollständig inaktiv.
 
 ---
 

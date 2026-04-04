@@ -128,12 +128,47 @@ Opens a dedicated tab with the full conversation view:
 
 ## Privacy
 
-- All processing happens **locally in the browser** — no separate cloud infrastructure is used.
-- **No data is sent to third parties or external servers.**
-- **Claude (API mode):** During export, the existing browser session is used to fetch the conversation via the Claude API. Session information (authentication tokens) is sent to the Claude platform — but these are the same credentials the browser already transmits during normal use. No additional data is disclosed beyond what is already part of the active session.
-- **ChatGPT, Gemini, Copilot (DOM scraping):** No network requests — content is read exclusively from the already-loaded DOM.
-- `chrome.storage.session` is used to pass data to the preview page — automatically cleared when the browser is closed.
-- The extension activates only on the four supported domains and is completely inactive on all other sites.
+All processing happens **locally in the browser**. No data is sent to the developer, no analytics, no tracking.
+
+### ChatGPT, Gemini, Microsoft Copilot
+
+These platforms are scraped from the **already-rendered DOM** — no network requests are made by the extension. The content is read from what the browser has already loaded and is processed entirely in memory.
+
+### Claude — what is sent during export
+
+Claude uses its official API to deliver complete and structured export data (including Artifacts, Thinking blocks, and generated files). This requires the extension to make authenticated requests to `claude.ai` on your behalf.
+
+**What is sent — and where:**
+
+All requests go exclusively to `claude.ai`. No data leaves your browser to any other destination.
+
+| Request | Endpoint | Purpose |
+|---------|----------|---------|
+| GET | `/api/organizations/{orgId}/chat_conversations/{id}?tree=True&rendering_mode=messages&render_all_tools=true` | Fetch the full conversation data |
+| GET | `/api/bootstrap` or `/api/organizations` | Determine the organisation ID (only if not already known from an intercepted page request) |
+| GET | `/api/share/{id}` | Fetch shared conversations (no authentication required) |
+| GET | Image URL on `claude.ai` | Fetch embedded images as Base64 for self-contained exports (only when "Embed images" option is enabled) |
+
+**What is sent with each request:**
+
+The requests use the browser's existing session cookies for `claude.ai` — the same cookies that are sent with every normal page interaction. No additional credentials are read, stored, or forwarded by the extension.
+
+**What happens to the data:**
+
+```
+claude.ai API  →  browser memory  →  local export file (HTML / ZIP / MD / PDF)
+```
+
+The conversation data is fetched into browser memory, converted into the export format, and written to a local file via the browser's download dialog. It is never uploaded, forwarded, or cached outside the current browser session. `chrome.storage.session` is used only to pass the data to the Preview & Select tab — it is automatically cleared when the browser is closed.
+
+**What the extension does not do:**
+
+- Does not read, store, or transmit your Claude API key or password
+- Does not modify any conversations or send any write requests
+- Does not collect usage data or statistics
+- Does not load any external scripts or resources into the extension itself (CDN libraries are only referenced inside the sandboxed iframes of exported artifact files)
+
+The extension activates only on the four supported domains and is completely inactive on all other sites.
 
 ---
 
