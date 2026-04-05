@@ -350,6 +350,65 @@ body {
 
 .error-icon { flex-shrink: 0; }
 
+/* Platform List */
+.platform-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.platform-list .section-label {
+  margin-bottom: 4px;
+}
+
+.platform-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  transition: all var(--transition);
+  width: 100%;
+  text-align: left;
+}
+
+.platform-row:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
+.platform-icon {
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.platform-name {
+  font-weight: 600;
+  flex: 1;
+}
+
+.platform-host {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.platform-arrow {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  transition: color var(--transition);
+}
+
+.platform-row:hover .platform-arrow {
+  color: var(--accent);
+}
+
 /* Utilities */
 .hidden {
   display: none !important;

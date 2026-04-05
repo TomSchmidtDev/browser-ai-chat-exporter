@@ -47,6 +47,13 @@
   // ── Log toggle ─────────────────────────────────────────────────────────
   $('#logToggle').addEventListener('click', () => logContent.classList.toggle('hidden'));
 
+  // ── Platform list links ────────────────────────────────────────────────
+  document.querySelectorAll('.platform-row').forEach(btn => {
+    btn.addEventListener('click', () => {
+      chrome.tabs.create({ url: btn.dataset.url });
+    });
+  });
+
   // ── Helpers ────────────────────────────────────────────────────────────
   function setStatus(type, text) {
     statusDot.className = 'status-dot ' + type;
@@ -165,7 +172,8 @@
 
       activePlatform = detectPlatform(tab.url);
       if (!activePlatform) {
-        setStatus('warn', 'Bitte öffne einen Chat auf einer unterstützten Plattform:<br>🔶 claude.ai &nbsp;·&nbsp; 🟢 chatgpt.com &nbsp;·&nbsp; 🔵 gemini.google.com &nbsp;·&nbsp; 🪟 m365.cloud.microsoft/chat');
+        setStatus('warn', 'Kein unterstützter Chat-Tab aktiv');
+        document.getElementById('platformList').classList.remove('hidden');
         return;
       }
 

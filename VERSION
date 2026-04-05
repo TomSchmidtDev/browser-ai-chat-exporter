@@ -1,4 +1,4 @@
-1.4.1
+1.5.0
 
 # Versioning scheme: MAJOR.MINOR.BUILD
 # MAJOR — breaking changes
@@ -6,6 +6,7 @@
 # BUILD — any fix or improvement
 
 # Changelog
+# 1.5.0  2026-04-05  Popup: platform list with direct links when no supported tab is active
 # 1.4.1  2026-04-04  Remove overly broad "tabs" permission (activeTab is sufficient)
 #                    Add privacy-policy.html · Add store screenshots (1280x800)
 #                    Add GitHub Actions release workflow
