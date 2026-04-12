@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AI Chat Exporter",
-  "version": "1.5.1",
+  "version": "1.6.0",
   "description": "Export conversations from Claude, ChatGPT, Gemini, and Microsoft Copilot as HTML, ZIP, Markdown, or PDF files",
   "permissions": [
     "activeTab",
@@ -15,7 +15,8 @@
     "https://chatgpt.com/*",
     "https://chat.openai.com/*",
     "https://gemini.google.com/*",
-    "https://m365.cloud.microsoft/*"
+    "https://m365.cloud.microsoft/*",
+    "https://copilot.microsoft.com/*"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -45,7 +46,7 @@
       "all_frames": false
     },
     {
-      "matches": ["https://m365.cloud.microsoft/*"],
+      "matches": ["https://m365.cloud.microsoft/*", "https://copilot.microsoft.com/*"],
       "js": ["platforms/copilot/content.js"],
       "run_at": "document_start",
       "all_frames": false

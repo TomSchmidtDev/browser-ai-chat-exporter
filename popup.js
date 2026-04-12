@@ -91,7 +91,7 @@
     if (url.includes('claude.ai'))   return 'claude';
     if (url.includes('chatgpt.com') || url.includes('chat.openai.com')) return 'chatgpt';
     if (url.includes('gemini.google.com')) return 'gemini';
-    if (url.includes('m365.cloud.microsoft')) return 'copilot';
+    if (url.includes('m365.cloud.microsoft') || url.includes('copilot.microsoft.com')) return 'copilot';
     return null;
   }
 

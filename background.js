@@ -13,7 +13,8 @@ const SUPPORTED_URLS = [
   'https://chatgpt.com/*',
   'https://chat.openai.com/*',
   'https://gemini.google.com/*',
-  'https://m365.cloud.microsoft/*'
+  'https://m365.cloud.microsoft/*',
+  'https://copilot.microsoft.com/*'
 ];
 
 // ── Context menu setup ─────────────────────────────────────────────────────

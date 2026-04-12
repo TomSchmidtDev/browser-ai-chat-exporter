@@ -4,7 +4,7 @@
 
 Browser extension for exporting conversations from **Claude**, **ChatGPT**, **Gemini**, and **Microsoft Copilot** — as complete, standalone files that work without an account, without the platform, and without an internet connection.
 
-**Version:** 1.5.1 · **Browser:** Chrome, Edge
+**Version:** 1.6.0 · **Browser:** Chrome, Edge
 
 ---
 
@@ -15,7 +15,8 @@ Browser extension for exporting conversations from **Claude**, **ChatGPT**, **Ge
 | 🔶 **Claude** | claude.ai | API + DOM fallback | Full feature set incl. Artifacts, Thinking, Tool Calls |
 | 🟢 **ChatGPT** | chatgpt.com | DOM scraping | Text, code, tables — no interactive widgets |
 | 🔵 **Gemini** | gemini.google.com | DOM scraping | Text, code, tables |
-| 🪟 **Microsoft Copilot** | m365.cloud.microsoft/chat | DOM scraping | Text, code, tables |
+| 🪟 **Microsoft Copilot** | copilot.microsoft.com | DOM scraping | Text, code, tables |
+| 🪟 **Microsoft Copilot M365** | m365.cloud.microsoft/chat | DOM scraping | Text, code, tables |
 
 ![Export dialog](screenshots/export-dialog.jpeg)
 
@@ -176,7 +177,7 @@ The extension activates only on the four supported domains and is completely ina
 
 ```
 ai-chat-exporter/
-├── manifest.json              v1.5.1, permissions: activeTab, storage,
+├── manifest.json              v1.6.0, permissions: activeTab, storage,
 │                              downloads, scripting, contextMenus
 ├── background.js              Downloads, context menu, tab opening for PDF
 ├── popup.html / popup.js      UI, platform detection, export orchestration

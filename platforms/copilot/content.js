@@ -1,6 +1,6 @@
 /**
  * AI Chat Exporter – Microsoft Copilot Content Script (Isolated World)
- * v1.2.3 — improved selectors + debug logging
+ * Supports: m365.cloud.microsoft (enterprise) + copilot.microsoft.com (consumer)
  */
 
 (function () {
@@ -166,20 +166,21 @@
     console.log('[CCE:Copilot] Strategy 1 (fai- articles):', allArticles.length,
       allArticles.map(a => a.className.match(/fai-\w+/)?.[0]).join(', '));
 
-    // ── Strategy 2: data-testid based ─────────────────────────────────
+    // ── Strategy 2: data-testid based (M365 variants) ─────────────────
     if (allArticles.length === 0) {
-      // Find all user and copilot message containers via data-testid
-      const userDivs    = Array.from(document.querySelectorAll('[data-testid*="user-message"]'));
-      const copilotDivs = Array.from(document.querySelectorAll('[data-testid*="copilot-message"]'));
+      // Exact testid match only — avoid picking up toolbar/reaction elements
+      const userDivs    = Array.from(document.querySelectorAll('[data-testid="user-message"]'));
+      const copilotDivs = Array.from(document.querySelectorAll('[data-testid="copilot-message"]'));
 
       console.log('[CCE:Copilot] Strategy 2 — user testid:', userDivs.length, 'copilot testid:', copilotDivs.length);
 
-      // Interleave by DOM position
-      const combined = [...userDivs, ...copilotDivs].sort((a, b) => {
-        const pos = a.compareDocumentPosition(b);
-        return pos & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
-      });
-      allArticles = combined;
+      if (userDivs.length > 0 || copilotDivs.length > 0) {
+        const combined = [...userDivs, ...copilotDivs].sort((a, b) => {
+          const pos = a.compareDocumentPosition(b);
+          return pos & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
+        });
+        allArticles = combined;
+      }
     }
 
     // ── Strategy 3: markdown-reply elements directly ───────────────────
@@ -195,8 +196,53 @@
         }
       }
       if (messages.length > 0) return buildResult(messages);
-      return null;
     }
+
+    // ── Strategy 4: copilot.microsoft.com consumer UI ──────────────────
+    // User messages: outermost element with Tailwind group class "group/user-message"
+    // AI messages:   [data-testid="ai-message"]
+    if (allArticles.length === 0) {
+      console.log('[CCE:Copilot] Strategy 4 — copilot.microsoft.com (group/user-message + ai-message)');
+
+      // Collect user message containers (filter to exact group root, not child utility classes)
+      const userEls = Array.from(document.querySelectorAll('[class*="group/user-message"]'))
+        .filter(el => el.classList.contains('group/user-message'));
+
+      // AI message containers
+      const aiEls = Array.from(document.querySelectorAll('[data-testid="ai-message"]'));
+
+      console.log('[CCE:Copilot] Strategy 4 — user:', userEls.length, 'ai:', aiEls.length);
+
+      if (userEls.length > 0 || aiEls.length > 0) {
+        // Merge and sort by DOM order
+        const all = [...userEls.map(el => ({ el, role: 'user' })),
+                     ...aiEls.map(el =>   ({ el, role: 'assistant' }))]
+          .sort((a, b) => {
+            const pos = a.el.compareDocumentPosition(b.el);
+            return pos & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
+          });
+
+        for (const { el, role } of all) {
+          if (role === 'user') {
+            // User text lives in a child — prefer [class*="max-w-user-text"] or first <p>, fallback to innerText
+            const textEl = el.querySelector('[class*="max-w-user-text"]')
+              || el.querySelector('p')
+              || el;
+            const text = (textEl.innerText || textEl.textContent || '').trim();
+            console.log('[CCE:Copilot] S4 user text length:', text.length);
+            if (text) messages.push({ id: null, role: 'user', content: [{ type: 'text', text }], createdAt: null });
+          } else {
+            const blocks = extractBlocksFromMarkdown(el);
+            console.log('[CCE:Copilot] S4 ai blocks:', blocks?.length ?? 0);
+            if (blocks?.length > 0) messages.push({ id: null, role: 'assistant', content: blocks, createdAt: null });
+          }
+        }
+
+        if (messages.length > 0) return buildResult(messages);
+      }
+    }
+
+    if (allArticles.length === 0 && messages.length === 0) return null;
 
     console.log('[CCE:Copilot] Processing', allArticles.length, 'articles');
 
@@ -273,7 +319,9 @@
 
   function buildResult(messages) {
     const title = document.title
-      .replace(/\s*[-–|]?\s*(Microsoft Copilot|Copilot)\s*$/i, '').trim()
+      .replace(/\s*[-–|]?\s*(Microsoft Copilot|Copilot)\s*$/i, '')
+      .replace(/^(Microsoft Copilot|Copilot)\s*[-–|]?\s*/i, '')
+      .trim()
       || 'Copilot Conversation';
     return { id: null, title, platform: 'copilot', createdAt: null, model: null, source: 'dom', messages };
   }
