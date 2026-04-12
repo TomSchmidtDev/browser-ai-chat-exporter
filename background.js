@@ -166,10 +166,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
+// Canonical implementation — must stay identical to shared/utils.js sanitizeFilename
 function sanitizeFilename(name) {
-  return name
-    .replace(/[<>:"/\\|?*]/g, '_')
+  return (name || 'export')
+    .replace(/[^a-zA-Z0-9äöüÄÖÜß _\-\.]/g, '')
     .replace(/\s+/g, '_')
-    .replace(/_+/g, '_')
-    .substring(0, 200);
+    .substring(0, 80);
 }

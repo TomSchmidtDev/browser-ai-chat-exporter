@@ -172,7 +172,7 @@
 
       activePlatform = detectPlatform(tab.url);
       if (!activePlatform) {
-        setStatus('warn', 'Kein unterstützter Chat-Tab aktiv');
+        setStatus('warn', 'No supported chat tab active');
         document.getElementById('platformList').classList.remove('hidden');
         return;
       }

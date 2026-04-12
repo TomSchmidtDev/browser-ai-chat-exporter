@@ -4,7 +4,7 @@
 
 Browser-Extension zum Exportieren von Gesprächen aus **Claude**, **ChatGPT**, **Gemini** und **Microsoft Copilot** — als vollständige, eigenständige Dateien die ohne Account, ohne Plattform und ohne Internetverbindung funktionieren.
 
-**Version:** 1.5.0 · **Browser:** Chrome, Edge
+**Version:** 1.5.1 · **Browser:** Chrome, Edge
 
 ---
 
@@ -176,7 +176,7 @@ Die Extension aktiviert sich nur auf den vier unterstützten Domains und ist auf
 
 ```
 ai-chat-exporter/
-├── manifest.json              v1.5.0, permissions: activeTab, storage,
+├── manifest.json              v1.5.1, permissions: activeTab, storage,
 │                              downloads, scripting, contextMenus
 ├── background.js              Downloads, Kontextmenü, Tab-Öffnung für PDF
 ├── popup.html / popup.js      UI, Plattformerkennung, Export-Orchestrierung
@@ -190,6 +190,7 @@ ai-chat-exporter/
 │   │   ├── injector.js        Page Context: fetch-Patch, Org-ID, Auth-API
 │   │   └── content.js         Bridge + API-Normalisierung + DOM-Fallback
 │   ├── chatgpt/
+│   │   ├── injector.js        Page Context: fetch-Patch, Conversation-ID-Capture
 │   │   └── content.js         DOM-Scraping (CodeMirror, Tabellen als HTML-Sentinel)
 │   ├── gemini/
 │   │   └── content.js         DOM-Scraping (Angular: user-query, model-response)
@@ -198,7 +199,8 @@ ai-chat-exporter/
 │                              fai-CopilotMessage, scriptor-component-code-block)
 │
 └── shared/
-    ├── utils.js               escHtml, markdownToHtml, formatFileSize
+    ├── utils.js               escHtml, escAttr, escSrcdoc, safeUrl,
+    │                          markdownToHtml, sanitizeFilename, formatFileSize
     ├── widget-css.js          CSS-Variablen + Artifact/Visualizer-Builder
     ├── html-template.js       Export-HTML-Template mit Copy-Button, Dark Mode
     └── exporters/
