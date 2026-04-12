@@ -1,4 +1,4 @@
-1.6.0
+1.7.0
 
 # Versioning scheme: MAJOR.MINOR.BUILD
 # MAJOR — breaking changes
@@ -6,6 +6,7 @@
 # BUILD — any fix or improvement
 
 # Changelog
+# 1.7.0  2026-04-12  Add i18n support (English/German), settings page for language selection
 # 1.6.0  2026-04-12  Add copilot.microsoft.com (consumer Copilot) support
 # 1.5.1  2026-04-12  Fix manifest description (add Gemini + Copilot), align background.js
 #                    sanitizeFilename with shared/utils.js, fix German strings in English UI

@@ -4,7 +4,7 @@
 
 Browser-Extension zum Exportieren von Gesprächen aus **Claude**, **ChatGPT**, **Gemini** und **Microsoft Copilot** — als vollständige, eigenständige Dateien die ohne Account, ohne Plattform und ohne Internetverbindung funktionieren.
 
-**Version:** 1.6.0 · **Browser:** Chrome, Edge
+**Version:** 1.7.0 · **Browser:** Chrome, Edge
 
 ---
 
@@ -177,11 +177,12 @@ Die Extension aktiviert sich nur auf den vier unterstützten Domains und ist auf
 
 ```
 ai-chat-exporter/
-├── manifest.json              v1.6.0, permissions: activeTab, storage,
+├── manifest.json              v1.7.0, permissions: activeTab, storage,
 │                              downloads, scripting, contextMenus
 ├── background.js              Downloads, Kontextmenü, Tab-Öffnung für PDF
 ├── popup.html / popup.js      UI, Plattformerkennung, Export-Orchestrierung
 ├── popup.css
+├── options.html / options.js  Einstellungsseite (Sprachauswahl)
 ├── preview.html / preview.js  Preview & Select (chrome.storage.session)
 │                              Unterstützt ?autoexport=<format> für Direktexport
 │                              aus dem Kontextmenü
@@ -200,6 +201,7 @@ ai-chat-exporter/
 │                              fai-CopilotMessage, scriptor-component-code-block)
 │
 └── shared/
+    ├── i18n.js                i18n-Runtime (en/de), t(), initI18n(), applyI18n()
     ├── utils.js               escHtml, escAttr, escSrcdoc, safeUrl,
     │                          markdownToHtml, sanitizeFilename, formatFileSize
     ├── widget-css.js          CSS-Variablen + Artifact/Visualizer-Builder

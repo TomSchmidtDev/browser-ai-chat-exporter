@@ -72,6 +72,32 @@ body {
   border-radius: 10px;
 }
 
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.settings-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition), background var(--transition);
+  padding: 0;
+}
+
+.settings-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+}
+
 /* Status */
 .status {
   display: flex;

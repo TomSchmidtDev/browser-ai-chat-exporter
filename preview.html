@@ -146,13 +146,13 @@
 <body>
 
 <div id="toolbar">
-  <h1>📋 Preview & Select</h1>
+  <h1 data-i18n="previewPageTitle">📋 Preview &amp; Select</h1>
   <div class="toolbar-sep"></div>
-  <span class="sel-count" id="selCount">Loading…</span>
+  <span class="sel-count" id="selCount"></span>
   <div class="toolbar-btns">
-    <button class="tb-btn secondary" id="btnSelectAll">De-/Select All</button>
-    <button class="tb-btn secondary" id="btnDeselectPrompts">De-/Select All Prompts</button>
-    <button class="tb-btn secondary" id="btnDeselectTools">De-/Select Tool Output</button>
+    <button class="tb-btn secondary" id="btnSelectAll" data-i18n="deselectAll">De-/Select All</button>
+    <button class="tb-btn secondary" id="btnDeselectPrompts" data-i18n="deselectPrompts">Deselect Prompts</button>
+    <button class="tb-btn secondary" id="btnDeselectTools" data-i18n="deselectTools">Deselect Tool Output</button>
     <div class="toolbar-sep"></div>
     <select class="fmt-select" id="fmtSelect">
       <option value="html">HTML</option>
@@ -160,14 +160,14 @@
       <option value="zip">ZIP</option>
       <option value="pdf">PDF</option>
     </select>
-    <button class="tb-btn primary" id="exportBtn">
+    <button class="tb-btn primary" id="exportBtn" data-i18n="exportSelected">
       ⬇ Export Selected
     </button>
   </div>
 </div>
 
 <div id="main">
-  <div id="loading">Loading chat data…</div>
+  <div id="loading" data-i18n="loadingChat">Loading chat data…</div>
   <div id="error-msg" style="display:none"></div>
   <div id="chat-meta" style="display:none"></div>
   <div id="messages"></div>
@@ -181,6 +181,7 @@
 <script src="shared/exporters/html.js"></script>
 <script src="shared/exporters/zip.js"></script>
 <script src="jszip.min.js"></script>
+<script src="shared/i18n.js"></script>
 <script src="preview.js"></script>
 </body>
 </html>

@@ -21,7 +21,7 @@ function exportMarkdown(data, options) {
   let artifactIndex = 0;
 
   for (const msg of data.messages) {
-    const role = msg.role === 'user' ? '**You**' : '**Assistant**';
+    const role = msg.role === 'user' ? `**${t('roleUser')}**` : `**${t('roleAssistant')}**`;
     const ts   = msg.createdAt ? ` *(${new Date(msg.createdAt).toLocaleString()})*` : '';
     lines.push(`### ${role}${ts}`);
     lines.push('');

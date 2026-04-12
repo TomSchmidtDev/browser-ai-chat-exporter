@@ -54,10 +54,15 @@
     });
   });
 
+  // ── Settings button ────────────────────────────────────────────────────
+  document.getElementById('settingsBtn').addEventListener('click', () => {
+    chrome.runtime.openOptionsPage();
+  });
+
   // ── Helpers ────────────────────────────────────────────────────────────
   function setStatus(type, text) {
     statusDot.className = 'status-dot ' + type;
-    statusText.innerHTML = text;
+    statusText.textContent = text;
   }
 
   function setProgress(pct, text) {
@@ -82,7 +87,7 @@
   function resetButton() {
     exportBtn.disabled = false;
     exportBtn.classList.remove('exporting');
-    exportBtn.querySelector('span').textContent = 'Export Chat';
+    exportBtn.querySelector('span').textContent = t('exportChat');
   }
 
   // ── Platform detection ─────────────────────────────────────────────────
@@ -166,29 +171,32 @@
   // ═══════════════════════════════════════════════════════════════════════
 
   async function init() {
+    await initI18n();
+    applyI18n();
+
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      if (!tab) { setStatus('error', 'No active tab'); return; }
+      if (!tab) { setStatus('error', t('noActiveTab')); return; }
 
       activePlatform = detectPlatform(tab.url);
       if (!activePlatform) {
-        setStatus('warn', 'No supported chat tab active');
+        setStatus('warn', t('noSupportedTab'));
         document.getElementById('platformList').classList.remove('hidden');
         return;
       }
 
-      setStatus('connecting', `Connecting to ${platformLabel(activePlatform)}…`);
+      setStatus('connecting', t('connecting', platformLabel(activePlatform)));
 
       const resp = await new Promise(resolve =>
         chrome.tabs.sendMessage(tab.id, { type: 'cce:ping' }, r => resolve(r))
       );
 
       if (!resp?.ok) {
-        setStatus('error', 'Content script not ready — reload the page');
+        setStatus('error', t('contentScriptNotReady'));
         return;
       }
 
-      setStatus('connected', `${platformLabel(activePlatform)} — ready`);
+      setStatus('connected', t('ready', platformLabel(activePlatform)));
 
       // Fetch chat data for preview
       const dataResp = await new Promise(resolve =>
@@ -196,7 +204,7 @@
       );
 
       if (!dataResp?.ok) {
-        setStatus('warn', `Connected — ${dataResp?.error || 'could not load preview'}`);
+        setStatus('warn', t('connected', dataResp?.error || t('couldNotLoadPreview')));
         exportSection.classList.remove('hidden');
         return;
       }
@@ -207,7 +215,7 @@
       chatTitle.textContent = chatData.title || 'Untitled';
       const msgCount  = chatData.messages?.length || 0;
       const artCount  = chatData.messages?.flatMap(m => m.content).filter(b => ['artifact','canvas','visualizer'].includes(b.type)).length || 0;
-      chatMeta.textContent = `${platformLabel(activePlatform)} · ${chatData.model || 'unknown model'} · ${msgCount} messages · ${artCount} artifacts`;
+      chatMeta.textContent = `${platformLabel(activePlatform)} · ${chatData.model || t('unknownModel')} · ${msgCount} ${t('messages')} · ${artCount} ${t('artifacts')}`;
 
       chatInfo.classList.remove('hidden');
       exportSection.classList.remove('hidden');
@@ -227,15 +235,15 @@
     isExporting = true;
     exportBtn.disabled = true;
     exportBtn.classList.add('exporting');
-    exportBtn.querySelector('span').textContent = 'Exporting…';
+    exportBtn.querySelector('span').textContent = t('exporting');
     errorEl.classList.add('hidden');
-    logContent.innerHTML = '';
-    setProgress(0, 'Starting…');
+    logContent.textContent = '';
+    setProgress(0, t('starting'));
 
     try {
       // If we have no cached data (e.g. preview failed), fetch now
       if (!chatData) {
-        setProgress(10, 'Fetching chat data…');
+        setProgress(10, t('fetchingChatData'));
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
         const resp  = await new Promise(resolve =>
           chrome.tabs.sendMessage(tab.id, { type: 'cce:get-chat-data' }, r => resolve(r))
@@ -257,7 +265,7 @@
         includeFiles:     $('#optFiles').checked,
       };
 
-      setProgress(40, `Generating ${selectedFormat.toUpperCase()}…`);
+      setProgress(40, t('generating', selectedFormat.toUpperCase()));
 
       let result;
       switch (selectedFormat) {
@@ -268,7 +276,7 @@
         default: throw new Error(`Unknown format: ${selectedFormat}`);
       }
 
-      setProgress(85, 'Preparing download…');
+      setProgress(85, t('preparingDownload'));
       if (!result.skipDownload) {
         await downloadResult(result, chatData.title);
       }
@@ -278,9 +286,9 @@
       log_('ok', `Export complete: ${selectedFormat.toUpperCase()} (${sizeKB} KB)`);
       log_('info', `Stats: ${stats.text} text, ${stats.artifacts} artifacts, ${stats.canvases} canvases, ${stats.images} images, ${stats.files} files, ${stats.tools} tools`);
 
-      const doneLabel = selectedFormat === 'pdf' ? 'PDF ready — Ctrl+P to print'
-                      : selectedFormat === 'zip' ? 'ZIP ready!'
-                      : 'Export complete!';
+      const doneLabel = selectedFormat === 'pdf' ? t('pdfReady')
+                      : selectedFormat === 'zip' ? t('zipReady')
+                      : t('exportComplete');
       setProgress(100, doneLabel);
       log_('ok', doneLabel);
 
@@ -301,21 +309,21 @@
 
   previewBtn.addEventListener('click', async () => {
     if (!chatData) {
-      showError('No chat data loaded yet. Wait for the connection.');
+      showError(t('noDataLoaded'));
       return;
     }
     previewBtn.disabled = true;
-    previewBtn.querySelector('span').textContent = 'Opening…';
+    previewBtn.querySelector('span').textContent = t('opening');
     try {
       // Store chat data in session storage so the preview page can read it
       await chrome.storage.session.set({ cce_preview_data: chatData });
       const url = chrome.runtime.getURL('preview.html');
       chrome.tabs.create({ url });
     } catch (err) {
-      showError('Could not open preview: ' + err.message);
+      showError(t('couldNotOpenPreview', err.message));
     } finally {
       previewBtn.disabled = false;
-      previewBtn.querySelector('span').textContent = 'Preview & Select';
+      previewBtn.querySelector('span').textContent = t('previewAndSelect');
     }
   });
 

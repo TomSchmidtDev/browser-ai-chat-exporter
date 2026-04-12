@@ -26,27 +26,27 @@ function blockIcon(type) {
 
 function blockLabel(block) {
   switch (block.type) {
-    case 'text':         return block.text?.substring(0, 120).replace(/\s+/g, ' ') || '(empty)';
+    case 'text':         return block.text?.substring(0, 120).replace(/\s+/g, ' ') || t('bEmpty');
     case 'code':         return `\`\`\`${block.language || ''}\` — ${block.code?.substring(0,60) || ''}`;
-    case 'artifact':     return `Artifact: ${block.title || block.artifactType || ''}`;
-    case 'visualizer':   return `Visualization: ${block.title || ''}`;
-    case 'canvas':       return `Canvas: ${block.name || ''} (${block.canvasType || ''})`;
-    case 'image':        return `Image${block.alt ? ': ' + block.alt : ''}`;
-    case 'thinking':     return `Thinking — ${block.text?.substring(0,80) || ''}`;
-    case 'web_search':   return `Search: ${block.query || ''}`;
-    case 'web_fetch':    return `Fetch: ${block.url || ''}`;
+    case 'artifact':     return `${t('bArtifact')}: ${block.title || block.artifactType || ''}`;
+    case 'visualizer':   return `${t('bViz')}: ${block.title || ''}`;
+    case 'canvas':       return `${t('bCanvas')}: ${block.name || ''} (${block.canvasType || ''})`;
+    case 'image':        return `${t('bImage')}${block.alt ? ': ' + block.alt : ''}`;
+    case 'thinking':     return `${t('bThinking')} — ${block.text?.substring(0,80) || ''}`;
+    case 'web_search':   return `${t('bSearch')}: ${block.query || ''}`;
+    case 'web_fetch':    return `${t('bFetch')}: ${block.url || ''}`;
     case 'bash':         return `$ ${block.command?.substring(0,80) || ''}`;
     case 'file_creation':return `📄 ${block.path || block.fileName || 'file'}`;
     case 'file_edit':    return `✏️ ${block.path || ''}`;
-    case 'present_files':return `Download: ${(block.paths||[]).join(', ').substring(0,60)}`;
+    case 'present_files':return `${t('bDownload')}: ${(block.paths||[]).join(', ').substring(0,60)}`;
     case 'attachment':   return `📎 ${block.fileName || ''}`;
-    case 'html':         return 'Table / HTML block';
-    case 'tool_result':  return `Result: ${block.text?.substring(0,60) || ''}`;
+    case 'html':         return t('bTable');
+    case 'tool_result':  return `${t('bResult')}: ${block.text?.substring(0,60) || ''}`;
     case 'mcp_tool':
     case 'widget_tool':
     case 'system_tool':
-    case 'tool_use':     return `Tool: ${block.toolName || block.type}`;
-    case 'message_compose': return `Message Draft (${block.kind || ''})`;
+    case 'tool_use':     return `${t('bTool')}: ${block.toolName || block.type}`;
+    case 'message_compose': return `${t('bDraft')} (${block.kind || ''})`;
     default:             return block.type;
   }
 }
@@ -77,9 +77,9 @@ function render() {
     header.onclick = () => toggleMsg(mi);
     header.innerHTML = `
       <div class="msg-check ${state.selected ? 'checked' : ''}" id="mc-${mi}"></div>
-      <span class="role-badge ${isUser ? 'user' : 'assistant'}">${isUser ? 'You' : 'Assistant'}</span>
+      <span class="role-badge ${isUser ? 'user' : 'assistant'}">${isUser ? t('roleUser') : t('roleAssistant')}</span>
       <span class="msg-summary">${escHtml(msgSummary(msg))}</span>
-      ${msg.content?.length > 1 ? `<span class="block-type-tag">${msg.content.length} blocks</span>` : ''}
+      ${msg.content?.length > 1 ? `<span class="block-type-tag">${t('nBlocks', msg.content.length)}</span>` : ''}
       ${msg.createdAt ? `<span class="msg-timestamp">${new Date(msg.createdAt).toLocaleTimeString()}</span>` : ''}
     `;
     card.appendChild(header);
@@ -156,7 +156,7 @@ function updateCount() {
   const totalBlocks = msgState.reduce((n, s) => n + s.blocks.length, 0);
   const selBlocks   = msgState.reduce((n, s) => n + s.blocks.filter(Boolean).length, 0);
   document.getElementById('selCount').textContent =
-    `${selMsgs}/${totalMsgs} messages · ${selBlocks}/${totalBlocks} blocks selected`;
+    t('messagesAndBlocks', selMsgs, totalMsgs, selBlocks, totalBlocks);
 }
 
 function toggleAll() {
@@ -191,14 +191,14 @@ function buildFilteredData() {
 async function doExport() {
   const btn = document.getElementById('exportBtn');
   btn.disabled = true;
-  btn.textContent = '⏳ Exporting…';
+  btn.textContent = t('exportingBtn');
 
   try {
     const fmt  = document.getElementById('fmtSelect').value;
     const data = buildFilteredData();
 
     if (data.messages.length === 0) {
-      alert('No messages selected. Please select at least one message.');
+      alert(t('noMessagesSelected'));
       return;
     }
 
@@ -219,13 +219,13 @@ async function doExport() {
       await sendDownloadAndOpen(result, data.title);
     }
 
-    btn.textContent = '✓ Done!';
-    setTimeout(() => { btn.disabled = false; btn.textContent = '⬇ Export Selected'; }, 2000);
+    btn.textContent = t('doneBtn');
+    setTimeout(() => { btn.disabled = false; btn.textContent = t('exportSelected'); }, 2000);
   } catch (err) {
     console.error('[CCE:Preview] Export error:', err);
     alert('Export failed: ' + err.message);
     btn.disabled = false;
-    btn.textContent = '⬇ Export Selected';
+    btn.textContent = t('exportSelected');
   }
 }
 
@@ -309,11 +309,14 @@ function toggleTools() {
 }
 
 async function init() {
-  // Wire toolbar buttons — must use addEventListener, not inline onclick (CSP)
+  // Wire toolbar buttons first — before any async work so clicks are never missed
   document.getElementById('btnSelectAll').addEventListener('click', toggleAll);
   document.getElementById('btnDeselectPrompts').addEventListener('click', togglePrompts);
   document.getElementById('btnDeselectTools').addEventListener('click', toggleTools);
   document.getElementById('exportBtn').addEventListener('click', doExport);
+
+  await initI18n();
+  applyI18n();
 
   // Check for autoexport mode (launched from context menu)
   const autoFormat = new URLSearchParams(window.location.search).get('autoexport');
@@ -321,7 +324,7 @@ async function init() {
     // Read chat data stored by popup.js before opening this tab
     const result = await chrome.storage.session.get('cce_preview_data');
     if (!result.cce_preview_data) {
-      throw new Error('No chat data found. Please trigger the export from the extension popup.');
+      throw new Error(t('noDataFound'));
     }
     chatData = result.cce_preview_data;
 
@@ -336,24 +339,47 @@ async function init() {
 
     // Render meta bar
     const platform = chatData.platform || '';
-    const badge = platform === 'claude' ? '🔶 Claude' : platform === 'chatgpt' ? '🟢 ChatGPT' : platform;
+    const badge = platform === 'claude'   ? '🔶 Claude'
+                : platform === 'chatgpt'  ? '🟢 ChatGPT'
+                : platform === 'gemini'   ? '🔵 Gemini'
+                : platform === 'copilot'  ? '🪟 Copilot'
+                : platform;
     const meta = document.getElementById('chat-meta');
     meta.style.display = 'flex';
-    meta.innerHTML = `
-      <span class="platform-badge">${badge}</span>
-      <strong>${escHtml(chatData.title || 'Chat')}</strong>
-      <span>${chatData.messages.length} messages</span>
-      ${chatData.model ? `<span>Model: ${escHtml(chatData.model)}</span>` : ''}
-      ${chatData.createdAt ? `<span>Created: ${new Date(chatData.createdAt).toLocaleString()}</span>` : ''}
-    `;
+
+    // Build meta content safely using DOM (no innerHTML with untrusted data)
+    meta.textContent = '';
+    const badgeEl = document.createElement('span');
+    badgeEl.className = 'platform-badge';
+    badgeEl.textContent = badge;
+    meta.appendChild(badgeEl);
+
+    const titleEl = document.createElement('strong');
+    titleEl.textContent = chatData.title || 'Chat';
+    meta.appendChild(titleEl);
+
+    const countEl = document.createElement('span');
+    countEl.textContent = t('metaMessages', chatData.messages.length);
+    meta.appendChild(countEl);
+
+    if (chatData.model) {
+      const modelEl = document.createElement('span');
+      modelEl.textContent = t('metaModel', chatData.model);
+      meta.appendChild(modelEl);
+    }
+    if (chatData.createdAt) {
+      const dateEl = document.createElement('span');
+      dateEl.textContent = t('metaCreated', new Date(chatData.createdAt).toLocaleString());
+      meta.appendChild(dateEl);
+    }
 
     document.getElementById('loading').style.display = 'none';
-    document.title = `Preview — ${chatData.title || 'Chat'}`;
+    document.title = `${t('previewPageTitle')} — ${chatData.title || 'Chat'}`;
 
     // Auto-export mode: triggered from context menu — export immediately and close tab
     if (autoFormat && ['html', 'markdown', 'zip', 'pdf'].includes(autoFormat)) {
       document.getElementById('loading').style.display = 'block';
-      document.getElementById('loading').textContent = `Exporting as ${autoFormat.toUpperCase()}…`;
+      document.getElementById('loading').textContent = t('exportingAs', autoFormat.toUpperCase());
       try {
         const options = {
           includeArtifacts: true, includeImages: true,

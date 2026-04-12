@@ -17,52 +17,83 @@ const SUPPORTED_URLS = [
   'https://copilot.microsoft.com/*'
 ];
 
-// ── Context menu setup ─────────────────────────────────────────────────────
-chrome.runtime.onInstalled.addListener(() => {
-  // Remove all existing items first (clean reinstall)
-  chrome.contextMenus.removeAll(() => {
-    // Root entry (shows as submenu)
-    chrome.contextMenus.create({
-      id: 'cce-root',
-      title: 'Chat exportieren',
-      contexts: ['page'],
-      documentUrlPatterns: SUPPORTED_URLS
-    });
+// ── Inline translations for context menus ─────────────────────────────────
+// (Cannot import shared/i18n.js in a service worker)
+const MENU_I18N = {
+  en: {
+    root:     'Export chat',
+    html:     '📄 Export as HTML',
+    markdown: '📝 Export as Markdown',
+    zip:      '📦 Export as ZIP',
+    pdf:      '🖨️ Export as PDF',
+    preview:  '📋 Preview & Select…',
+  },
+  de: {
+    root:     'Chat exportieren',
+    html:     '📄 Als HTML exportieren',
+    markdown: '📝 Als Markdown exportieren',
+    zip:      '📦 Als ZIP exportieren',
+    pdf:      '🖨️ Als PDF exportieren',
+    preview:  '📋 Vorschau & Auswahl…',
+  }
+};
 
-    const formats = [
-      { id: 'cce-html',     title: '📄 Als HTML exportieren' },
-      { id: 'cce-markdown', title: '📝 Als Markdown exportieren' },
-      { id: 'cce-zip',      title: '📦 Als ZIP exportieren' },
-      { id: 'cce-pdf',      title: '🖨️ Als PDF exportieren' },
-    ];
+async function resolveMenuLang() {
+  try {
+    const stored = await chrome.storage.sync.get('cce_language');
+    const pref = stored.cce_language;
+    if (pref && pref !== 'auto' && MENU_I18N[pref]) return pref;
+    const ui = chrome.i18n.getUILanguage().split('-')[0].toLowerCase();
+    return MENU_I18N[ui] ? ui : 'en';
+  } catch (_) {
+    return 'en';
+  }
+}
 
-    for (const fmt of formats) {
+async function setupMenus() {
+  const lang = await resolveMenuLang();
+  const s = MENU_I18N[lang] || MENU_I18N.en;
+
+  return new Promise(resolve => {
+    chrome.contextMenus.removeAll(() => {
       chrome.contextMenus.create({
-        id: fmt.id,
-        parentId: 'cce-root',
-        title: fmt.title,
-        contexts: ['page'],
-        documentUrlPatterns: SUPPORTED_URLS
+        id: 'cce-root', title: s.root,
+        contexts: ['page'], documentUrlPatterns: SUPPORTED_URLS
       });
-    }
 
-    // Separator
-    chrome.contextMenus.create({
-      id: 'cce-sep',
-      parentId: 'cce-root',
-      type: 'separator',
-      contexts: ['page'],
-      documentUrlPatterns: SUPPORTED_URLS
-    });
+      const formats = [
+        { id: 'cce-html',     title: s.html },
+        { id: 'cce-markdown', title: s.markdown },
+        { id: 'cce-zip',      title: s.zip },
+        { id: 'cce-pdf',      title: s.pdf },
+      ];
+      for (const fmt of formats) {
+        chrome.contextMenus.create({
+          id: fmt.id, parentId: 'cce-root', title: fmt.title,
+          contexts: ['page'], documentUrlPatterns: SUPPORTED_URLS
+        });
+      }
 
-    chrome.contextMenus.create({
-      id: 'cce-preview',
-      parentId: 'cce-root',
-      title: '📋 Preview & Select…',
-      contexts: ['page'],
-      documentUrlPatterns: SUPPORTED_URLS
+      chrome.contextMenus.create({
+        id: 'cce-sep', parentId: 'cce-root', type: 'separator',
+        contexts: ['page'], documentUrlPatterns: SUPPORTED_URLS
+      });
+      chrome.contextMenus.create({
+        id: 'cce-preview', parentId: 'cce-root', title: s.preview,
+        contexts: ['page'], documentUrlPatterns: SUPPORTED_URLS
+      });
+
+      resolve();
     });
   });
+}
+
+// ── Context menu setup ─────────────────────────────────────────────────────
+chrome.runtime.onInstalled.addListener(() => { setupMenus(); });
+
+// Recreate menus when language preference changes
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'sync' && changes.cce_language) { setupMenus(); }
 });
 
 // ── Context menu click handler ─────────────────────────────────────────────

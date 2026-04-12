@@ -54,7 +54,7 @@ async function exportZip(data, options) {
   for (const msg of data.messages) {
     const isUser    = msg.role === 'user';
     const roleClass = isUser ? 'user' : 'assistant';
-    const roleLabel = isUser ? 'You' : 'Assistant';
+    const roleLabel = isUser ? t('roleUser') : t('roleAssistant');
     let contentHtml = '';
 
     for (const block of (msg.content || [])) {

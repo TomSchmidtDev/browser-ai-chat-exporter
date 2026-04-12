@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AI Chat Exporter",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "Export conversations from Claude, ChatGPT, Gemini, and Microsoft Copilot as HTML, ZIP, Markdown, or PDF files",
   "permissions": [
     "activeTab",
@@ -54,6 +54,10 @@
   ],
   "background": {
     "service_worker": "background.js"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
   },
   "web_accessible_resources": [
     {
