@@ -6,9 +6,16 @@
   <title>Settings — AI Chat Exporter</title>
   <style>
     :root {
-      --bg: #1a1a2e; --surface: #16213e; --border: rgba(255,255,255,0.08);
-      --text: #e0e0e0; --text-sec: #9ca3af; --text-muted: #6b7280;
-      --accent: #e94560; --accent-hover: #ff6b81; --radius: 8px;
+      color-scheme: light dark;
+      --bg: Canvas;
+      --surface: ButtonFace;
+      --border: ButtonBorder;
+      --text: CanvasText;
+      --text-sec:   light-dark(#4b5563, #c9d1d9);
+      --text-muted: light-dark(#9ca3af, #8b949e);
+      --accent: #e94560;
+      --accent-hover: light-dark(#d63050, #ff6b81);
+      --radius: 8px;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -39,7 +46,9 @@
       background-position: right 12px center;
       padding-right: 36px;
     }
-    .field select:focus { outline: none; border-color: var(--accent); }
+    .field select:focus { border-color: var(--accent); }
+    .field select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .field select:focus:not(:focus-visible) { outline: none; }
     .actions { display: flex; align-items: center; gap: 12px; }
     .save-btn {
       padding: 10px 24px; background: var(--accent); border: none;

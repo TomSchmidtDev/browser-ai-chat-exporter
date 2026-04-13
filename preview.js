@@ -72,8 +72,10 @@ function render() {
     card.id = `msg-${mi}`;
 
     // Header
-    const header = document.createElement('div');
+    const header = document.createElement('button');
+    header.type = 'button';
     header.className = 'msg-header';
+    header.setAttribute('aria-pressed', state.selected ? 'true' : 'false');
     header.onclick = () => toggleMsg(mi);
     header.innerHTML = `
       <div class="msg-check ${state.selected ? 'checked' : ''}" id="mc-${mi}"></div>
@@ -83,6 +85,7 @@ function render() {
       ${msg.createdAt ? `<span class="msg-timestamp">${new Date(msg.createdAt).toLocaleTimeString()}</span>` : ''}
     `;
     card.appendChild(header);
+    card.querySelector('.msg-check')?.setAttribute('aria-hidden', 'true');
 
     // Blocks (only if message has >1 block or contains interesting types)
     if (msg.content && msg.content.length > 0) {
@@ -91,9 +94,11 @@ function render() {
 
       msg.content.forEach((block, bi) => {
         const bSelected = state.blocks[bi];
-        const row = document.createElement('div');
+        const row = document.createElement('button');
+        row.type = 'button';
         row.className = `block-row${bSelected ? '' : ' deselected'}`;
         row.id = `br-${mi}-${bi}`;
+        row.setAttribute('aria-pressed', bSelected ? 'true' : 'false');
         row.onclick = (e) => { e.stopPropagation(); toggleBlock(mi, bi); };
         row.innerHTML = `
           <div class="block-check ${bSelected ? 'checked' : ''}" id="bc-${mi}-${bi}"></div>
@@ -103,6 +108,7 @@ function render() {
           </span>
         `;
         blocksDiv.appendChild(row);
+        row.querySelector('.block-check')?.setAttribute('aria-hidden', 'true');
       });
 
       card.appendChild(blocksDiv);
@@ -139,13 +145,18 @@ function updateCard(mi) {
   const card = document.getElementById(`msg-${mi}`);
   if (!card) return;
   card.classList.toggle('deselected', !state.selected);
+  const headerBtn = card.querySelector('.msg-header');
+  if (headerBtn) headerBtn.setAttribute('aria-pressed', state.selected ? 'true' : 'false');
   const mc = document.getElementById(`mc-${mi}`);
   if (mc) mc.className = `msg-check ${state.selected ? 'checked' : ''}`;
 
   msgState[mi].blocks.forEach((bSel, bi) => {
     const row = document.getElementById(`br-${mi}-${bi}`);
     const bc  = document.getElementById(`bc-${mi}-${bi}`);
-    if (row) row.classList.toggle('deselected', !bSel);
+    if (row) {
+      row.classList.toggle('deselected', !bSel);
+      row.setAttribute('aria-pressed', bSel ? 'true' : 'false');
+    }
     if (bc)  bc.className = `block-check ${bSel ? 'checked' : ''}`;
   });
 }

@@ -138,6 +138,29 @@
   .block-label code { background: rgba(0,0,0,0.07); padding: 1px 4px; border-radius: 3px; font-family: var(--font-mono); font-size: 0.85em; }
   .block-type-tag { font-size: 10px; color: var(--text-sec); background: rgba(0,0,0,0.05); padding: 1px 5px; border-radius: 10px; margin-left: 4px; }
 
+  /* ── Button reset for interactive rows ── */
+  button.msg-header,
+  button.block-row {
+    appearance: none;
+    border: none;
+    font: inherit;
+    color: inherit;
+    width: 100%;
+    text-align: left;
+  }
+
+  /* ── Focus indicators ── */
+  .tb-btn:focus-visible,
+  .fmt-select:focus-visible {
+    outline: 2px solid rgba(255,255,255,0.8);
+    outline-offset: 2px;
+  }
+  button.msg-header:focus-visible,
+  button.block-row:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
   /* ── Spinner ── */
   #loading { text-align: center; padding: 60px 20px; color: var(--text-sec); font-size: 15px; }
   #error-msg { background: #fee2e2; color: #991b1b; padding: 16px 20px; border-radius: 8px; margin: 20px; }
@@ -148,13 +171,13 @@
 <div id="toolbar">
   <h1 data-i18n="previewPageTitle">📋 Preview &amp; Select</h1>
   <div class="toolbar-sep"></div>
-  <span class="sel-count" id="selCount"></span>
+  <span class="sel-count" id="selCount" aria-live="polite" aria-atomic="true"></span>
   <div class="toolbar-btns">
     <button class="tb-btn secondary" id="btnSelectAll" data-i18n="deselectAll">De-/Select All</button>
     <button class="tb-btn secondary" id="btnDeselectPrompts" data-i18n="deselectPrompts">Deselect Prompts</button>
     <button class="tb-btn secondary" id="btnDeselectTools" data-i18n="deselectTools">Deselect Tool Output</button>
     <div class="toolbar-sep"></div>
-    <select class="fmt-select" id="fmtSelect">
+    <select class="fmt-select" id="fmtSelect" aria-label="Export format">
       <option value="html">HTML</option>
       <option value="markdown">Markdown</option>
       <option value="zip">ZIP</option>
@@ -167,8 +190,8 @@
 </div>
 
 <div id="main">
-  <div id="loading" data-i18n="loadingChat">Loading chat data…</div>
-  <div id="error-msg" style="display:none"></div>
+  <div id="loading" role="status" aria-live="polite" data-i18n="loadingChat">Loading chat data…</div>
+  <div id="error-msg" role="alert" style="display:none"></div>
   <div id="chat-meta" style="display:none"></div>
   <div id="messages"></div>
 </div>

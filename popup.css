@@ -1,22 +1,35 @@
 /* Claude Chat Exporter - Popup Styles */
 
 :root {
-  --bg-primary: #1a1a2e;
-  --bg-secondary: #16213e;
-  --bg-tertiary: #0f3460;
-  --bg-hover: #1a3a6a;
-  --text-primary: #e0e0e0;
-  --text-secondary: #9ca3af;
-  --text-muted: #6b7280;
-  --accent: #e94560;
-  --accent-hover: #ff6b81;
-  --accent-dim: rgba(233, 69, 96, 0.15);
-  --success: #10b981;
-  --warning: #f59e0b;
-  --error: #ef4444;
-  --border: rgba(255, 255, 255, 0.08);
-  --radius: 8px;
-  --radius-sm: 5px;
+  color-scheme: light dark;
+
+  /* System colors — follow OS/browser theme automatically */
+  --bg-primary:   Canvas;
+  --bg-secondary: ButtonFace;
+  --text-primary: CanvasText;
+  --border:       ButtonBorder;
+
+  /* Secondary colors with explicit light/dark values */
+  --bg-tertiary:    light-dark(#e8e8f0, #2a2a40);
+  --bg-hover:       light-dark(#ebebf5, #303050);
+  --bg-log:         light-dark(#f0f0f5, #0d1117);
+  --text-secondary: light-dark(#4b5563, #c9d1d9);
+  --text-muted:     light-dark(#9ca3af, #8b949e);
+  --border-hover:   light-dark(rgba(0,0,0,0.20), rgba(255,255,255,0.20));
+
+  /* Brand accent */
+  --accent:       #e94560;
+  --accent-hover: light-dark(#d63050, #ff6b81);
+  --accent-dim:   light-dark(rgba(233,69,96,0.12), rgba(233,69,96,0.18));
+
+  /* Semantic states */
+  --success:  #10b981;
+  --warning:  #f59e0b;
+  --error:    #ef4444;
+  --error-fg: light-dark(#b91c1c, #fca5a5);
+
+  --radius:     8px;
+  --radius-sm:  5px;
   --transition: 150ms ease;
 }
 
@@ -34,14 +47,13 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   font-size: 13px;
   line-height: 1.5;
-  overflow-y: auto;
 }
 
 #app {
-  padding: 16px;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
 }
 
 /* Header */
@@ -160,7 +172,7 @@ body {
 .export-section {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .section-label {
@@ -196,7 +208,7 @@ body {
 
 .format-btn:hover {
   background: var(--bg-hover);
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: var(--border-hover);
   color: var(--text-primary);
 }
 
@@ -221,7 +233,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 5px 8px;
+  padding: 3px 8px;
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: background var(--transition);
@@ -344,7 +356,7 @@ body {
 .log-content {
   margin-top: 8px;
   padding: 8px;
-  background: #0d1117;
+  background: var(--bg-log);
   border-radius: var(--radius-sm);
   font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
   font-size: 10px;
@@ -357,9 +369,9 @@ body {
 }
 
 .log-content .log-info { color: #58a6ff; }
-.log-content .log-ok { color: #3fb950; }
+.log-content .log-ok   { color: #3fb950; }
 .log-content .log-warn { color: #d29922; }
-.log-content .log-err { color: #f85149; }
+.log-content .log-err  { color: #f85149; }
 
 /* Error */
 .error {
@@ -370,7 +382,7 @@ body {
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.25);
   border-radius: var(--radius);
-  color: #fca5a5;
+  color: var(--error-fg);
   font-size: 12px;
 }
 
@@ -452,7 +464,28 @@ body {
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--border-hover);
+}
+
+/* ── Button reset for section-label toggle ── */
+button.section-label {
+  appearance: none;
+  background: transparent;
+  border: none;
+  font: inherit;
+  color: inherit;
+  width: 100%;
+  text-align: left;
+}
+
+/* ── Focus indicators (keyboard navigation) ── */
+.format-btn:focus-visible,
+.export-btn:focus-visible,
+.settings-btn:focus-visible,
+.platform-row:focus-visible,
+.section-label.clickable:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* ── Additional states ── */

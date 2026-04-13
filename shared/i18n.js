@@ -255,6 +255,9 @@ function applyI18n(root) {
   r.querySelectorAll('[data-i18n-title]').forEach(el => {
     el.title = t(el.dataset.i18nTitle);
   });
+  r.querySelectorAll('[data-i18n-aria-label]').forEach(el => {
+    el.setAttribute('aria-label', t(el.dataset.i18nAriaLabel));
+  });
 }
 
 function getCurrentLang() { return _lang; }

@@ -11,6 +11,9 @@
 (function () {
   'use strict';
 
+  // Mark all inline SVGs as decorative so screen readers skip them
+  document.querySelectorAll('svg').forEach(s => s.setAttribute('aria-hidden', 'true'));
+
   // ── State ──────────────────────────────────────────────────────────────
   let selectedFormat = 'html';
   let chatData       = null;
@@ -38,14 +41,21 @@
   // ── Format buttons ─────────────────────────────────────────────────────
   document.querySelectorAll('.format-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.format-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
+      });
       btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
       selectedFormat = btn.dataset.format;
     });
   });
 
   // ── Log toggle ─────────────────────────────────────────────────────────
-  $('#logToggle').addEventListener('click', () => logContent.classList.toggle('hidden'));
+  $('#logToggle').addEventListener('click', () => {
+    const nowHidden = logContent.classList.toggle('hidden');
+    $('#logToggle').setAttribute('aria-expanded', String(!nowHidden));
+  });
 
   // ── Platform list links ────────────────────────────────────────────────
   document.querySelectorAll('.platform-row').forEach(btn => {
@@ -67,6 +77,7 @@
 
   function setProgress(pct, text) {
     progressFill.style.width = pct + '%';
+    progress.querySelector('.progress-bar').setAttribute('aria-valuenow', pct);
     progressText.textContent = text;
     progress.classList.remove('hidden');
   }
