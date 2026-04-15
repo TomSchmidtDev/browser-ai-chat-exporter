@@ -115,6 +115,10 @@ These policies apply to all code changes in this repository. They were establish
 ### Permissions (manifest.json)
 - The `"tabs"` permission is **not needed** — `"activeTab"` is sufficient. Do not add `"tabs"` back without justification.
 - `preview.html` must **not** be listed in `web_accessible_resources`. Keep it extension-internal only.
+- `web_accessible_resources` must be minimal: only list files that are actually injected into web pages by content scripts. `jszip.min.js` and `chatgpt/injector.js` must **not** be listed (they are not injected into any web page).
+- The manifest must declare an explicit `content_security_policy` for extension pages: `"script-src 'self'; object-src 'self'"`.
+- All image `src` attributes set from scraped data must be wrapped in `safeUrl()` before `escAttr()`. `block.base64` (data: URIs produced internally) is exempt.
+- All `block.type` or other API-supplied strings placed in `innerHTML` must be wrapped in `escHtml()`.
 
 ### Licensing & NOTICE
 - Any new bundled dependency (JS file copied into the repo) must be added to the `NOTICE` file with its name, version, copyright, license, and source URL.

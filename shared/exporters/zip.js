@@ -146,7 +146,8 @@ async function exportZip(data, options) {
             zip.file(imgPath, b64, { base64: true });
             contentHtml += `<div class="image-block"><img src="${imgPath}" alt="${escAttr(block.alt || '')}" loading="lazy"></div>`;
           } else if (block.src) {
-            contentHtml += `<div class="image-block"><img src="${escAttr(block.src)}" alt="${escAttr(block.alt || '')}" loading="lazy"></div>`;
+            const safeSrc = safeUrl(block.src);
+            if (safeSrc !== '#') contentHtml += `<div class="image-block"><img src="${escAttr(safeSrc)}" alt="${escAttr(block.alt || '')}" loading="lazy"></div>`;
           }
           break;
         }

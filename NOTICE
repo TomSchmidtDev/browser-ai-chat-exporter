@@ -7,7 +7,7 @@ This product includes third-party software components listed below.
 
 JSZip v3.10.1
 Copyright (c) 2009-2016 Stuart Knightley <stuart [at] stuartk.com>
-License: MIT (dual-licensed MIT / GPLv3)
+License: MIT (dual-licensed MIT / GPLv3) — used in this project under the MIT license
 Source: https://github.com/Stuk/jszip
 Used as: bundled library (jszip.min.js) for ZIP archive creation
 

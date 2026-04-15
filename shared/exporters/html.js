@@ -135,8 +135,8 @@ function renderMessagesToHtml(data, options, artifactUrlResolver) {
         // ── Images ───────────────────────────────────────────────────────
         case 'image': {
           if (!options.includeImages) break;
-          const imgSrc = block.base64 || block.src || '';
-          if (imgSrc) contentHtml += `<div class="image-block"><img src="${escAttr(imgSrc)}" alt="${escAttr(block.alt || '')}" loading="lazy"></div>`;
+          const imgSrc = block.base64 || (block.src ? safeUrl(block.src) : '');
+          if (imgSrc && imgSrc !== '#') contentHtml += `<div class="image-block"><img src="${escAttr(imgSrc)}" alt="${escAttr(block.alt || '')}" loading="lazy"></div>`;
           break;
         }
 

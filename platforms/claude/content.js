@@ -98,7 +98,7 @@
         type: CCE_PREFIX + 'request:' + requestType,
         requestId,
         ...payload
-      }, '*');
+      }, window.location.origin);
     });
   }
 

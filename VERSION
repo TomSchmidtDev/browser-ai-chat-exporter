@@ -1,4 +1,4 @@
-1.8.1
+1.8.2
 
 # Versioning scheme: MAJOR.MINOR.BUILD
 # MAJOR — breaking changes
@@ -6,6 +6,11 @@
 # BUILD — any fix or improvement
 
 # Changelog
+# 1.8.2  2026-04-15  Security hardening: escHtml block.type in preview.js, safeUrl()
+#                    on image src in html.js+zip.js, postMessage('*')→location.origin
+#                    in content.js; remove vestigial chatgpt/injector.js + jszip from
+#                    web_accessible_resources; explicit CSP in manifest; JSZip MIT
+#                    election clarified in NOTICE
 # 1.8.1  2026-04-15  Bundle vendor libraries locally (React, ReactDOM, Babel, Tailwind,
 #                    Recharts, Mermaid) to comply with CWS MV3 no-external-code policy
 # 1.8.0  2026-04-13  Adaptive light/dark theme using browser system colors; accessibility

@@ -104,7 +104,7 @@ function render() {
           <div class="block-check ${bSelected ? 'checked' : ''}" id="bc-${mi}-${bi}"></div>
           <span class="block-label">
             ${blockIcon(block.type)} ${escHtml(blockLabel(block))}
-            <span class="block-type-tag">${block.type}</span>
+            <span class="block-type-tag">${escHtml(block.type)}</span>
           </span>
         `;
         blocksDiv.appendChild(row);
