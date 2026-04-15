@@ -167,7 +167,7 @@ Die Konversationsdaten werden in den Browser-Arbeitsspeicher geladen, in das gew
 - Liest, speichert oder überträgt keinen Claude-API-Key oder kein Passwort
 - Verändert keine Konversationen und sendet keine Schreibanfragen
 - Erfasst keine Nutzungsdaten oder Statistiken
-- Lädt keine externen Skripte oder Ressourcen in die Extension selbst (CDN-Bibliotheken werden ausschließlich in den sandboxierten iframes exportierter Artifact-Dateien referenziert)
+- Lädt keine externen Skripte oder Ressourcen in die Extension selbst (Vendor-Bibliotheken sind lokal gebündelt und werden ausschließlich in die sandboxierten iframes exportierter Artifact-Dateien eingebettet)
 
 Die Extension aktiviert sich nur auf den vier unterstützten Domains und ist auf allen anderen Seiten vollständig inaktiv.
 
