@@ -200,12 +200,28 @@ ai-chat-exporter/
 │       └── content.js         DOM scraping (Fluent UI: fai-UserMessage,
 │                              fai-CopilotMessage, scriptor-component-code-block)
 │
+├── scripts/
+│   └── bundle-vendors.js      Node.js generator: reads shared/vendor/* and
+│                              writes shared/vendor.js (run after updating vendors)
+│
 └── shared/
     ├── i18n.js                i18n runtime (en/de), t(), initI18n(), applyI18n()
     ├── utils.js               escHtml, escAttr, escSrcdoc, safeUrl,
     │                          markdownToHtml, sanitizeFilename, formatFileSize
-    ├── widget-css.js          CSS variables + artifact/visualizer builder
-    ├── html-template.js       Export HTML template with copy button, dark mode
+    ├── vendor.js              AUTO-GENERATED — bundled vendor libs as JS string
+    │                          constants (VENDOR_REACT, VENDOR_MERMAID, etc.)
+    ├── vendor/                Raw vendor files (source of truth for versions):
+    │   ├── react.production.min.js       React v18.2.0
+    │   ├── react-dom.production.min.js   ReactDOM v18.2.0
+    │   ├── babel.min.js                  Babel Standalone v7.23.9
+    │   ├── tailwind.min.css              Tailwind CSS v2.2.19
+    │   ├── Recharts.min.js               Recharts v2.12.7
+    │   ├── mermaid.min.js                Mermaid v10.6.1
+    │   ├── highlight.min.js              highlight.js v11.9.0
+    │   └── highlight-dark.min.css        highlight.js dark theme
+    ├── widget-css.js          CSS variables + artifact/visualizer iframe builder
+    ├── html-template.js       Export HTML template with copy button, dark mode,
+    │                          syntax highlighting (hljs), Mermaid placeholder
     └── exporters/
         ├── html.js            HTML & PDF exporter
         ├── markdown.js        Markdown exporter
