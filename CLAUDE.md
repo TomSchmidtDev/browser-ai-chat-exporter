@@ -116,14 +116,11 @@ These policies apply to all code changes in this repository. They were establish
 - The `"tabs"` permission is **not needed** — `"activeTab"` is sufficient. Do not add `"tabs"` back without justification.
 - `preview.html` must **not** be listed in `web_accessible_resources`. Keep it extension-internal only.
 
-### CDN scripts in artifact iframes
-- All `<script src="https://cdnjs...">` and `<link href="https://cdnjs...">` tags injected into artifact iframes should carry `integrity=` SRI hashes. When updating a CDN library version, regenerate the SRI hash (`openssl dgst -sha384 -binary <file> | openssl base64 -A`).
-
 ### Licensing & NOTICE
 - Any new bundled dependency (JS file copied into the repo) must be added to the `NOTICE` file with its name, version, copyright, license, and source URL.
-- CDN-only dependencies (only referenced in injected HTML strings, never loaded by the extension itself) should also be listed in `NOTICE` under a clearly labeled "CDN / runtime" section.
 - The project license is **Business Source License 1.1** (converts to Apache 2.0 on 2031-04-04). All bundled dependencies must be compatible (MIT, Apache 2.0, BSD, ISC). GPLv3-only code must not be bundled.
 - After adding any dependency, run a license check before committing.
+- Vendor JS/CSS files (React, ReactDOM, Babel, Tailwind, Recharts, Mermaid) are bundled locally in `shared/vendor/` and inlined into `shared/vendor.js` via `scripts/bundle-vendors.js`. To update a vendor version: replace the file in `shared/vendor/`, re-run `node scripts/bundle-vendors.js`, and update the version in `NOTICE`.
 
 ### `sanitizeFilename` — single source of truth
 - The canonical implementation lives in `shared/utils.js`. Do not duplicate it in `background.js`, `preview.js`, or elsewhere. Import/reference `shared/utils.js` or copy the exact same function if scoping requires it.

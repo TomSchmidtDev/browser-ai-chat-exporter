@@ -36,7 +36,7 @@
     if (orgMatch && !state.orgId) {
       state.orgId = orgMatch[1];
       log('Captured org ID:', state.orgId);
-      window.postMessage({ type: CCE_PREFIX + 'org-id', orgId: state.orgId }, '*');
+      window.postMessage({ type: CCE_PREFIX + 'org-id', orgId: state.orgId }, window.location.origin);
     }
 
     // Intercept conversation load responses
@@ -58,7 +58,7 @@
               type: CCE_PREFIX + 'conversation-cached',
               convId: convId,
               messageCount: data.chat_messages?.length || 0
-            }, '*');
+            }, window.location.origin);
           }
         }).catch(() => { /* Not JSON or other error, ignore */ });
 
@@ -167,6 +167,12 @@
           const { url } = event.data;
           log('Fetching file:', url);
 
+          // Only allow fetching from claude.ai — reject arbitrary URLs
+          if (!url || !url.startsWith('https://claude.ai/')) {
+            respond(requestId, { error: 'Invalid URL: only https://claude.ai/ URLs are allowed' });
+            break;
+          }
+
           try {
             const response = await originalFetch(url);
             if (!response.ok) {
@@ -209,7 +215,7 @@
     window.postMessage({
       type: CCE_PREFIX + 'response:' + requestId,
       ...payload
-    }, '*');
+    }, window.location.origin);
   }
 
   async function discoverOrgId() {
@@ -248,14 +254,14 @@
 
     if (state.orgId) {
       log('Discovered org ID:', state.orgId);
-      window.postMessage({ type: CCE_PREFIX + 'org-id', orgId: state.orgId }, '*');
+      window.postMessage({ type: CCE_PREFIX + 'org-id', orgId: state.orgId }, window.location.origin);
     }
 
     return state.orgId;
   }
 
   // Signal that injector is ready
-  window.postMessage({ type: CCE_PREFIX + 'injector-ready' }, '*');
+  window.postMessage({ type: CCE_PREFIX + 'injector-ready' }, window.location.origin);
   log('Injector loaded');
 
 })();

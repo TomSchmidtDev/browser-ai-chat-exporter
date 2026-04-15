@@ -32,12 +32,16 @@ function escSrcdoc(str) {
 /** Very basic Markdown → HTML (no external library needed) */
 function markdownToHtml(md) {
   if (!md) return '';
-  let html = escHtml(md);
 
-  // Fenced code blocks  ```lang\n...\n```
-  html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) =>
-    `<pre class="md-code"><code${lang ? ` class="language-${lang}"` : ''}>${code}</code></pre>`
-  );
+  // Extract fenced code blocks BEFORE HTML-escaping so raw content is preserved
+  const codeBlocks = [];
+  const PH = '\x01';  // SOH — not modified by escHtml
+  let src = md.replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => {
+    codeBlocks.push({ lang: (lang || '').toLowerCase(), code });
+    return PH + (codeBlocks.length - 1) + PH;
+  });
+
+  let html = escHtml(src);
 
   // Headers
   html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
@@ -103,11 +107,23 @@ function markdownToHtml(md) {
   html = html.replace(/(<\/h[123]>)\s*<\/p>/g, '$1');
   html = html.replace(/<p>\s*(<ul>)/g,         '$1');
   html = html.replace(/(<\/ul>)\s*<\/p>/g,     '$1');
-  html = html.replace(/<p>\s*(<pre)/g,         '$1');
-  html = html.replace(/(<\/pre>)\s*<\/p>/g,    '$1');
   html = html.replace(/<p>\s*(<hr>)\s*<\/p>/g, '$1');
   html = html.replace(/<p>\s*(<table>)/g,      '$1');
   html = html.replace(/(<\/table>)\s*<\/p>/g,  '$1');
+
+  // Unwrap <p> around code block placeholders before re-insertion
+  html = html.replace(new RegExp('<p>\\s*' + PH + '(\\d+)' + PH + '\\s*</p>', 'g'), PH + '$1' + PH);
+
+  // Re-insert code blocks: mermaid → <div class="mermaid">, others → <pre><code>
+  if (codeBlocks.length) {
+    html = html.replace(new RegExp(PH + '(\\d+)' + PH, 'g'), (_, i) => {
+      const { lang, code } = codeBlocks[+i];
+      if (lang === 'mermaid') {
+        return `<div class="mermaid">${escHtml(code.trim())}</div>`;
+      }
+      return `<pre class="md-code"><code${lang ? ` class="language-${lang}"` : ''}>${escHtml(code)}</code></pre>`;
+    });
+  }
 
   return html;
 }

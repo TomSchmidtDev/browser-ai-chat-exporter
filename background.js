@@ -128,6 +128,14 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
+  // Only accept download-related messages from extension pages (popup, preview)
+  const isExtensionPage = sender.url?.startsWith(chrome.runtime.getURL(''));
+  if (!isExtensionPage && (
+    message.type === 'cce:download' ||
+    message.type === 'cce:download-blob' ||
+    message.type === 'cce:download-and-open'
+  )) return;
+
   if (message.type === 'cce:download') {
     const { filename, content, mimeType } = message;
 

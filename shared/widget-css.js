@@ -117,11 +117,11 @@ function buildRunnableArtifact(block) {
   // Mermaid
   if (type === 'application/vnd.ant.mermaid') {
     return `<!DOCTYPE html><html><head><meta charset="utf-8">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"><\/script>
+<script>${VENDOR_MERMAID}<\/script>
 <style>body{margin:16px;font-family:-apple-system,sans-serif;background:#fff}</style>
 </head><body>
 <div class="mermaid">${escHtml(code)}</div>
-<script>mermaid.initialize({startOnLoad:true,theme:'neutral'});<\/script>
+<script>mermaid.initialize({startOnLoad:false,theme:'neutral'});mermaid.run();<\/script>
 </body></html>`;
   }
 
@@ -172,11 +172,11 @@ function buildRunnableArtifact(block) {
       : `window.__CCE_DEFAULT_EXPORT__ || (() => React.createElement('div',null,'Component rendered'))`;
 
     return `<!DOCTYPE html><html><head><meta charset="utf-8">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"><\/script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"><\/script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"><\/script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.12.7/Recharts.min.js"><\/script>
+<script>${VENDOR_REACT}<\/script>
+<script>${VENDOR_REACT_DOM}<\/script>
+<script>${VENDOR_BABEL}<\/script>
+<style>${VENDOR_TAILWIND_CSS}</style>
+<script>${VENDOR_RECHARTS}<\/script>
 <style>${WIDGET_CSS_VARS}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}#root{min-height:100vh}#error{display:none;padding:20px;color:#e53e3e;font-family:monospace;white-space:pre-wrap}</style>
 </head><body><div id="root"></div><div id="error"></div>
 <script type="text/babel" data-type="module">

@@ -70,8 +70,9 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
   }
   .copy-btn:hover { background:rgba(127,127,127,0.12); border-color:rgba(127,127,127,0.25); color:#6b7280; }
   .copy-btn.copied { color:#10b981; border-color:rgba(16,185,129,0.4); }
-  .code-block pre { background:var(--bg-code); color:#d4d4d4; padding:14px; overflow-x:auto; margin:0; }
-  .code-block code { font-family:var(--font-mono); font-size:13px; line-height:1.5; }
+  .code-block pre { background:var(--bg-code); padding:14px; overflow-x:auto; margin:0; }
+  .code-block pre code.hljs { background:transparent; padding:0; font-size:13px; line-height:1.5; }
+  .code-block code { font-family:var(--font-mono); font-size:13px; line-height:1.5; color:#d4d4d4; }
   .artifact-block { margin:16px 0; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
   .artifact-header { display:flex; align-items:center; gap:8px; padding:10px 14px;
     background:rgba(127,127,127,0.08); font-size:13px; font-weight:600; }
@@ -85,6 +86,8 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
   .artifact-link { border-top:1px solid var(--border); padding:6px 14px; font-size:12px; background:rgba(127,127,127,0.04); }
   .artifact-link a { color:var(--accent-user); text-decoration:none; }
   .artifact-link a:hover { text-decoration:underline; }
+  .mermaid { margin:16px 0; text-align:center; overflow-x:auto; }
+  .mermaid svg { max-width:100%; height:auto; }
   .file-tag { font-size:10px; color:var(--text-sec); opacity:0.7; margin-left:4px; }
   .present-files-list { margin:6px 0 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:4px; }
   .present-files-list li { display:flex; align-items:baseline; gap:8px; }
@@ -127,6 +130,7 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
   }
   @media (max-width:600px) { .artifact-preview iframe { height:300px; } }
 </style>
+<style>${VENDOR_HLJS_CSS}</style>
 </head>
 <body>
 <div class="container">
@@ -144,7 +148,10 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
   {{MESSAGES}}
   </div>
 </div>
+{{MERMAID_SCRIPT}}
+<script>${VENDOR_HLJS}<\/script>
 <script>
+  hljs.highlightAll();
   document.querySelectorAll('.copy-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
       var code = btn.closest('.code-block') && btn.closest('.code-block').querySelector('code');

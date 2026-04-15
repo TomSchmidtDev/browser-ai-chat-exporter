@@ -21,6 +21,7 @@ async function exportZip(data, options) {
   const zip = new JSZip();
   let artifactCounter = 0;
   let imageCounter    = 0;
+  let hasMermaid      = false;
 
   // ── Pass 1: collect paths that were presented as download buttons ──────
   // These files are already packed into files/ — link only, no inline preview.
@@ -60,17 +61,28 @@ async function exportZip(data, options) {
     for (const block of (msg.content || [])) {
       switch (block.type) {
 
-        case 'text':
-          contentHtml += `<div class="text-block">${markdownToHtml(block.text)}</div>`;
+        case 'text': {
+          const textHtml = markdownToHtml(block.text);
+          if (textHtml.includes('<div class="mermaid">')) hasMermaid = true;
+          contentHtml += `<div class="text-block">${textHtml}</div>`;
           break;
+        }
 
         case 'html':
           contentHtml += `<div class="html-block">${sanitizeHtmlBlock(block.html)}</div>`;
           break;
 
-        case 'code':
-          contentHtml += `<div class="code-block"><div class="code-header"><div class="code-header-left"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>${escHtml(block.language || '')}</div><button class="copy-btn" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="copy-label">Copy</span></button></div><pre><code>${escHtml(block.code)}</code></pre></div>`;
+        case 'code': {
+          if (block.language && block.language.toLowerCase() === 'mermaid') {
+            const mermaidHtml = buildRunnableArtifact({ artifactType: 'application/vnd.ant.mermaid', sourceCode: block.code });
+            const mermaidPath = artifactResolver(block, ++artifactCounter, mermaidHtml);
+            contentHtml += `<div class="artifact-block"><div class="artifact-header"><span class="artifact-icon">📊</span><span class="artifact-title">Mermaid Diagram</span></div><div class="artifact-preview"><iframe src="${mermaidPath}" sandbox="allow-scripts" loading="lazy"></iframe></div><div class="artifact-link"><a href="${mermaidPath}" target="_blank">↗ Open diagram</a></div></div>`;
+          } else {
+            const langClass = block.language ? ` class="language-${escAttr(block.language)}"` : '';
+            contentHtml += `<div class="code-block"><div class="code-header"><div class="code-header-left"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>${escHtml(block.language || '')}</div><button class="copy-btn" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="copy-label">Copy</span></button></div><pre><code${langClass}>${escHtml(block.code)}</code></pre></div>`;
+          }
           break;
+        }
 
         // ── Artifacts → artifacts/ folder ─────────────────────────────
         case 'artifact': {
@@ -83,7 +95,7 @@ async function exportZip(data, options) {
               <span class="artifact-title">${escHtml(block.title || 'Artifact')}</span>
               <span class="artifact-type">${escHtml(block.artifactType || '')}</span>
             </div>
-            <div class="artifact-preview"><iframe src="${artPath}" sandbox="allow-scripts allow-same-origin" loading="lazy"></iframe></div>
+            <div class="artifact-preview"><iframe src="${artPath}" sandbox="allow-scripts" loading="lazy"></iframe></div>
             <div class="artifact-link"><a href="${artPath}" target="_blank">↗ Open artifact</a></div>
           </div>`;
           break;
@@ -99,7 +111,7 @@ async function exportZip(data, options) {
               <span class="artifact-title">${escHtml(block.name || 'Canvas')}</span>
               <span class="artifact-type">${escHtml(block.canvasType || '')}</span>
             </div>
-            <div class="artifact-preview"><iframe src="${cvPath}" sandbox="allow-scripts allow-same-origin" loading="lazy"></iframe></div>
+            <div class="artifact-preview"><iframe src="${cvPath}" sandbox="allow-scripts" loading="lazy"></iframe></div>
             <div class="artifact-link"><a href="${cvPath}" target="_blank">↗ Open canvas</a></div>
           </div>`;
           break;
@@ -114,7 +126,7 @@ async function exportZip(data, options) {
               <span class="artifact-icon">🎨</span>
               <span class="artifact-title">${escHtml(block.title || 'Visualization')}</span>
             </div>
-            <div class="artifact-preview"><iframe src="${vizPath}" sandbox="allow-scripts allow-same-origin" loading="lazy"></iframe></div>
+            <div class="artifact-preview"><iframe src="${vizPath}" sandbox="allow-scripts" loading="lazy"></iframe></div>
             <div class="artifact-link"><a href="${vizPath}" target="_blank">↗ Open visualization</a></div>
           </div>`;
           break;
@@ -229,7 +241,7 @@ async function exportZip(data, options) {
   }
 
   // ── Build index.html ──────────────────────────────────────────────────
-  zip.file('index.html', buildFullHtml(data, messagesHtml, artifactCounter));
+  zip.file('index.html', buildFullHtml(data, messagesHtml, artifactCounter, hasMermaid));
 
   // ── Compress and download ─────────────────────────────────────────────
   const zipBlob = await zip.generateAsync({

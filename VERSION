@@ -1,4 +1,4 @@
-1.8.0
+1.8.1
 
 # Versioning scheme: MAJOR.MINOR.BUILD
 # MAJOR — breaking changes
@@ -6,6 +6,8 @@
 # BUILD — any fix or improvement
 
 # Changelog
+# 1.8.1  2026-04-15  Bundle vendor libraries locally (React, ReactDOM, Babel, Tailwind,
+#                    Recharts, Mermaid) to comply with CWS MV3 no-external-code policy
 # 1.8.0  2026-04-13  Adaptive light/dark theme using browser system colors; accessibility
 #                    improvements (ARIA live regions, focus-visible, semantic buttons)
 # 1.7.1  2026-04-12  Remove unused 'scripting' permission (CWS policy fix)

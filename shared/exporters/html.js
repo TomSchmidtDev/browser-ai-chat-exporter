@@ -14,6 +14,7 @@ function renderMessagesToHtml(data, options, artifactUrlResolver) {
 
   let messagesHtml  = '';
   let artifactCounter = 0;
+  let hasMermaid = false;
 
   for (const msg of data.messages) {
     const isUser   = msg.role === 'user';
@@ -25,18 +26,28 @@ function renderMessagesToHtml(data, options, artifactUrlResolver) {
       switch (block.type) {
 
         // ── Text / code ─────────────────────────────────────────────────
-        case 'text':
-          contentHtml += `<div class="text-block">${markdownToHtml(block.text)}</div>`;
+        case 'text': {
+          const textHtml = markdownToHtml(block.text);
+          if (textHtml.includes('<div class="mermaid">')) hasMermaid = true;
+          contentHtml += `<div class="text-block">${textHtml}</div>`;
           break;
+        }
 
         case 'html':
           // Raw HTML block (e.g. tables passed through from ChatGPT DOM)
           contentHtml += `<div class="html-block">${sanitizeHtmlBlock(block.html)}</div>`;
           break;
 
-        case 'code':
-          contentHtml += `<div class="code-block"><div class="code-header"><div class="code-header-left"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>${escHtml(block.language || '')}</div><button class="copy-btn" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="copy-label">Copy</span></button></div><pre><code>${escHtml(block.code)}</code></pre></div>`;
+        case 'code': {
+          if (block.language && block.language.toLowerCase() === 'mermaid') {
+            const mermaidHtml = buildRunnableArtifact({ artifactType: 'application/vnd.ant.mermaid', sourceCode: block.code });
+            contentHtml += `<div class="artifact-block"><div class="artifact-header"><span class="artifact-icon">📊</span><span class="artifact-title">Mermaid Diagram</span></div><div class="artifact-preview"><iframe srcdoc="${escSrcdoc(mermaidHtml)}" sandbox="allow-scripts" loading="lazy"></iframe></div></div>`;
+          } else {
+            const langClass = block.language ? ` class="language-${escAttr(block.language)}"` : '';
+            contentHtml += `<div class="code-block"><div class="code-header"><div class="code-header-left"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>${escHtml(block.language || '')}</div><button class="copy-btn" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg><span class="copy-label">Copy</span></button></div><pre><code${langClass}>${escHtml(block.code)}</code></pre></div>`;
+          }
           break;
+        }
 
         // ── Claude artifacts ─────────────────────────────────────────────
         case 'artifact': {
@@ -49,9 +60,9 @@ function renderMessagesToHtml(data, options, artifactUrlResolver) {
 
           let iframeTag;
           if (resolved) {
-            iframeTag = `<iframe src="${resolved}" sandbox="allow-scripts allow-same-origin" loading="lazy"></iframe>`;
+            iframeTag = `<iframe src="${resolved}" sandbox="allow-scripts" loading="lazy"></iframe>`;
           } else {
-            iframeTag = `<iframe srcdoc="${escSrcdoc(artHtml)}" sandbox="allow-scripts allow-same-origin" loading="lazy"></iframe>`;
+            iframeTag = `<iframe srcdoc="${escSrcdoc(artHtml)}" sandbox="allow-scripts" loading="lazy"></iframe>`;
           }
 
           contentHtml += `<div class="artifact-block">
@@ -77,9 +88,9 @@ function renderMessagesToHtml(data, options, artifactUrlResolver) {
 
           let iframeTag;
           if (resolved) {
-            iframeTag = `<iframe src="${resolved}" sandbox="allow-scripts allow-same-origin" loading="lazy"></iframe>`;
+            iframeTag = `<iframe src="${resolved}" sandbox="allow-scripts" loading="lazy"></iframe>`;
           } else {
-            iframeTag = `<iframe srcdoc="${escSrcdoc(cvHtml)}" sandbox="allow-scripts allow-same-origin" loading="lazy"></iframe>`;
+            iframeTag = `<iframe srcdoc="${escSrcdoc(cvHtml)}" sandbox="allow-scripts" loading="lazy"></iframe>`;
           }
 
           contentHtml += `<div class="artifact-block">
@@ -105,7 +116,7 @@ function renderMessagesToHtml(data, options, artifactUrlResolver) {
 
           let iframeTag;
           if (resolved) {
-            iframeTag = `<iframe src="${resolved}" sandbox="allow-scripts allow-same-origin" loading="lazy"></iframe>`;
+            iframeTag = `<iframe src="${resolved}" sandbox="allow-scripts" loading="lazy"></iframe>`;
           } else {
             iframeTag = `<iframe srcdoc="${escSrcdoc(vizHtml)}" sandbox="allow-scripts" loading="lazy"></iframe>`;
           }
@@ -212,12 +223,12 @@ function renderMessagesToHtml(data, options, artifactUrlResolver) {
     messagesHtml += `<div class="message ${roleClass}"><div class="message-header"><span class="role-badge ${roleClass}">${roleLabel}</span>${msg.createdAt ? `<span class="timestamp">${new Date(msg.createdAt).toLocaleString()}</span>` : ''}</div><div class="message-content">${contentHtml}</div></div>`;
   }
 
-  return { messagesHtml, artifactCounter };
+  return { messagesHtml, artifactCounter, hasMermaid };
 }
 
 // ── Shared HTML builder ───────────────────────────────────────────────────
 
-function buildFullHtml(data, messagesHtml, artifactCounter) {
+function buildFullHtml(data, messagesHtml, artifactCounter, hasMermaid = false) {
   const platform = data.platform || 'unknown';
   const badge = platform === 'claude'
     ? '🔶 Claude'
@@ -239,15 +250,18 @@ function buildFullHtml(data, messagesHtml, artifactCounter) {
     .replaceAll('{{EXPORT_DATE}}',    new Date().toLocaleString())
     .replaceAll('{{MESSAGE_COUNT}}',  String(data.messages?.length || 0))
     .replaceAll('{{ARTIFACT_COUNT}}', String(artifactCounter))
-    .replace('{{MESSAGES}}',          () => messagesHtml); // keep function replacer to avoid $-issues
+    .replace('{{MESSAGES}}',          () => messagesHtml) // keep function replacer to avoid $-issues
+    .replace('{{MERMAID_SCRIPT}}',    () => hasMermaid
+      ? `<script>${VENDOR_MERMAID}<\/script><script>mermaid.initialize({startOnLoad:false,theme:'neutral'});mermaid.run();<\/script>`
+      : '');
 }
 
 // ── HTML exporter ─────────────────────────────────────────────────────────
 
 function exportHtml(data, options) {
-  const { messagesHtml, artifactCounter } = renderMessagesToHtml(data, options, null);
+  const { messagesHtml, artifactCounter, hasMermaid } = renderMessagesToHtml(data, options, null);
   return {
-    content:   buildFullHtml(data, messagesHtml, artifactCounter),
+    content:   buildFullHtml(data, messagesHtml, artifactCounter, hasMermaid),
     extension: 'html',
     mimeType:  'text/html;charset=utf-8'
   };
