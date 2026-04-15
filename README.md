@@ -167,7 +167,7 @@ The conversation data is fetched into browser memory, converted into the export 
 - Does not read, store, or transmit your Claude API key or password
 - Does not modify any conversations or send any write requests
 - Does not collect usage data or statistics
-- Does not load any external scripts or resources into the extension itself (CDN libraries are only referenced inside the sandboxed iframes of exported artifact files)
+- Does not load any external scripts or resources into the extension itself (vendor libraries are bundled locally and only embedded inside the sandboxed iframes of exported artifact files)
 
 The extension activates only on the four supported domains and is completely inactive on all other sites.
 
